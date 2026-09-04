@@ -8,6 +8,7 @@
 	import { nowLocalInput } from '$lib/time';
 	import { MAX_PHOTOS_PER_ENTRY, type MealEntry, type MealType, type Photo } from '$lib/types';
 	import MealTypePicker from './MealTypePicker.svelte';
+	import VoiceInput from './VoiceInput.svelte';
 
 	let { entry }: { entry?: MealEntry } = $props();
 
@@ -85,6 +86,11 @@
 		existingPhotos = existingPhotos.filter((p) => p.id !== photo.id);
 	}
 
+	function onDictated(text: string) {
+		const current = description.trim();
+		description = current ? `${current}, ${text}` : text;
+	}
+
 	function removeStaged(id: string) {
 		const item = staged.find((s) => s.id === id);
 		if (item) URL.revokeObjectURL(item.preview);
@@ -133,6 +139,7 @@
 	<label for="description">Qu'as-tu mangé&nbsp;?</label>
 	<textarea id="description" rows="3" bind:value={description} placeholder="2 œufs, pain complet, café noir"
 	></textarea>
+	<VoiceInput onText={onDictated} disabled={saving} />
 
 	{#if chips.length}
 		<div class="chips">
