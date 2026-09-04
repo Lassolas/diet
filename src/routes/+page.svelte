@@ -20,7 +20,10 @@
 
 <header>
 	<h1>Journal</h1>
-	<a class="btn" href="/report">Rapport</a>
+	<nav>
+		<a class="btn" href="/poids">Poids</a>
+		<a class="btn" href="/report">Rapport</a>
+	</nav>
 </header>
 
 {#if data.loadError}
@@ -64,6 +67,10 @@
 		align-items: center;
 		justify-content: space-between;
 		padding-top: 12px;
+	}
+	header nav {
+		display: flex;
+		gap: 8px;
 	}
 	header .btn {
 		text-decoration: none;

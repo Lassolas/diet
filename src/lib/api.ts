@@ -1,4 +1,4 @@
-import type { MealEntry, MealEntryInput, Photo } from '$lib/types';
+import type { MealEntry, MealEntryInput, Photo, WeighIn, WeighInInput } from '$lib/types';
 
 async function unwrap<T>(res: Response): Promise<T> {
 	if (!res.ok) {
@@ -61,5 +61,40 @@ export const api = {
 	async frequentItems(mealType?: string): Promise<string[]> {
 		const qs = mealType ? `?mealType=${mealType}` : '';
 		return (await unwrap<{ items: string[] }>(await fetch(`/api/frequent-items${qs}`))).items;
+	},
+
+	async listWeighIns(range?: { from?: string; to?: string }): Promise<WeighIn[]> {
+		const qs = new URLSearchParams();
+		if (range?.from) qs.set('from', range.from);
+		if (range?.to) qs.set('to', range.to);
+		const res = await fetch(`/api/weigh-ins?${qs}`);
+		return (await unwrap<{ weighIns: WeighIn[] }>(res)).weighIns;
+	},
+
+	async getWeighIn(id: string): Promise<WeighIn> {
+		return (await unwrap<{ weighIn: WeighIn }>(await fetch(`/api/weigh-ins/${id}`))).weighIn;
+	},
+
+	async createWeighIn(input: WeighInInput): Promise<WeighIn> {
+		const res = await fetch('/api/weigh-ins', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ weighIn: WeighIn }>(res)).weighIn;
+	},
+
+	async updateWeighIn(id: string, input: WeighInInput): Promise<WeighIn> {
+		const res = await fetch(`/api/weigh-ins/${id}`, {
+			method: 'PATCH',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ weighIn: WeighIn }>(res)).weighIn;
+	},
+
+	async deleteWeighIn(id: string): Promise<void> {
+		const res = await fetch(`/api/weigh-ins/${id}`, { method: 'DELETE' });
+		if (!res.ok) throw new Error(await res.text());
 	}
 };

@@ -4,7 +4,7 @@
 	import type { PageData } from './$types';
 	import { groupEntriesByDay } from '$lib/domain/reportGrouping';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL } from '$lib/ui';
+	import { MEAL_TYPE_LABEL, CONDITION_LABEL } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -15,6 +15,7 @@
 	let withPhotos = $state(true);
 
 	const days = $derived(groupEntriesByDay(data.entries, data.from, data.to));
+	const weighIns = $derived([...data.weighIns].reverse()); // oldest first for the report
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'
@@ -37,6 +38,27 @@
 <article class="report" class:hide-photos={!withPhotos}>
 	<h1>Journal alimentaire</h1>
 	<p class="meta">Du {formatDay(data.from)} au {formatDay(data.to)} · généré le {generatedAt}</p>
+
+	{#if weighIns.length}
+		<section class="weights">
+			<h2>Poids</h2>
+			<table>
+				<thead>
+					<tr><th>Date</th><th>Heure</th><th>Poids</th><th>Condition</th></tr>
+				</thead>
+				<tbody>
+					{#each weighIns as w (w.id)}
+						<tr>
+							<td>{formatDay(w.measuredAt.slice(0, 10))}</td>
+							<td>{formatTime(w.measuredAt)}</td>
+							<td>{w.weightKg.toFixed(1)} kg</td>
+							<td>{CONDITION_LABEL[w.condition]}</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</section>
+	{/if}
 
 	{#each days as day (day.date)}
 		<section class="day">
@@ -106,11 +128,33 @@
 		font-size: 0.9rem;
 		margin: 4px 0 20px;
 	}
+	.weights {
+		break-inside: avoid;
+		margin-bottom: 22px;
+	}
+	.weights table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 0.9rem;
+	}
+	.weights th,
+	.weights td {
+		text-align: left;
+		padding: 4px 8px;
+		border-bottom: 1px solid var(--border);
+	}
+	.weights th {
+		text-transform: capitalize;
+	}
+	.weights td:first-child {
+		text-transform: capitalize;
+	}
 	.day {
 		break-inside: avoid;
 		margin-bottom: 18px;
 	}
-	.day h2 {
+	.day h2,
+	.weights h2 {
 		font-size: 1rem;
 		text-transform: capitalize;
 		border-bottom: 1px solid var(--border);

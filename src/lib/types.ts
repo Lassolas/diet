@@ -31,3 +31,22 @@ export interface MealEntryInput {
 	/** Whether the entry has (or will have) at least one photo. Used for validation. */
 	hasPhoto?: boolean;
 }
+
+export const WEIGH_IN_CONDITIONS = ['fasted', 'clothed'] as const;
+export type WeighInCondition = (typeof WEIGH_IN_CONDITIONS)[number];
+
+export interface WeighIn {
+	id: string;
+	/** 'YYYY-MM-DDTHH:MM', Europe/Paris wall-clock (ADR 0002). */
+	measuredAt: string;
+	weightKg: number;
+	condition: WeighInCondition;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface WeighInInput {
+	measuredAt: string;
+	weightKg: number;
+	condition: WeighInCondition;
+}

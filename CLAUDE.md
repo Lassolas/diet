@@ -37,9 +37,12 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   column in a list query — `repo.ts` selects photo metadata only and fetches
   bytes one row at a time via `getPhotoBytes`.
 - **Domain logic is pure and tested**: `mealType`, `frequentItems`,
-  `validateEntry`, `reportGrouping` under `src/lib/domain/`. Both the client
-  (`EntryForm`) and the server routes import the same functions. Change behaviour
-  here test-first.
+  `validateEntry`, `validateWeighIn`, `reportGrouping` under `src/lib/domain/`.
+  Both the client (`EntryForm` / `WeighInForm`) and the server routes import the
+  same functions. Change behaviour here test-first.
+- **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
+  to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
+  list/add/edit pages). Not linked to `meal_entry`.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.

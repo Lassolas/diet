@@ -35,6 +35,9 @@ Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
   the resized JPEG, ADR 0004), `content_type`, `position`, `created_at`.
   Max 5 per entry. List/get queries select photo metadata only, never `bytes`.
 - Entry delete cascades to its photo rows in SQL.
+- `weigh_in`: `id` (ULID), `measured_at` (text `YYYY-MM-DDTHH:MM`, Paris
+  wall-clock), `weight_kg` (real), `condition` (`fasted|clothed`), `created_at`,
+  `updated_at`. A separate time series from `meal_entry`; multiple per day.
 
 Migrations are Wrangler D1 migration files in `migrations/`, applied manually.
 Backup relies on D1 Time Travel, plus a manual `wrangler d1 export` before risky
@@ -51,9 +54,11 @@ REST-ish, all under `/api` and gated by Cloudflare Access:
 - `GET /api/frequent-items?mealType=` — SQL aggregate ranking past
   Descriptions by frequency and recency
 - `GET /photos/:id` — reads the blob from D1, long cache header
+- `GET /api/weigh-ins?from=&to=` · `POST /api/weigh-ins` ·
+  `GET|PATCH|DELETE /api/weigh-ins/:id`
 
-The Report is not a server feature: the frontend calls `GET /api/entries` for a
-date range and renders a print layout.
+The Report is not a server feature: the frontend calls `GET /api/entries` and
+`GET /api/weigh-ins` for a date range and renders a print layout.
 
 ## Client logic worth testing (Vitest, test-first)
 
@@ -61,6 +66,7 @@ date range and renders a print layout.
   18–23 dinner
 - `rankFrequentItems(entries, mealType)` — frequency x recency
 - `validateEntry(input)` — the description-or-photo rule
+- `validateWeighIn(input)` — weight range, time format, condition
 - Report date grouping (including empty days shown as "no entries logged")
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality

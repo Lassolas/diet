@@ -1,9 +1,9 @@
 # Diet
 
-A personal food diary. The user records the meals they eat so a dietician can
-review them offline. The app is an interface facilitator: its job is to make
-logging a meal almost frictionless and to produce a clean record to hand to the
-dietician. It does no nutritional analysis of its own.
+A personal food diary. The user records the meals they eat, and their weight,
+so a dietician can review them offline. The app is an interface facilitator: its
+job is to make logging almost frictionless and to produce a clean record to hand
+to the dietician. It does no nutritional analysis of its own.
 
 ## Language
 
@@ -35,6 +35,18 @@ The free-text, sentence-style account of what was eaten ("2 eggs, toast, black
 coffee"). Never structured into ingredients or quantities.
 _Avoid_: contents, food list, ingredients
 
+**Weigh-in**:
+A single recorded body-weight measurement — when it was taken, the weight in
+kilograms, and its Condition. A separate time series from the Food Diary;
+multiple per day are allowed.
+_Avoid_: weight entry, measurement, reading
+
+**Condition**:
+The circumstances of a Weigh-in, recorded so the dietician can compare like with
+like: **à jeun** (the standard empty-stomach measurement) or **habillé** (a
+casual one). Chosen as a single toggle, not two independent flags.
+_Avoid_: state, mode, context
+
 **Frequent Item**:
 A Description the user logs often (e.g. "protein shaker"), surfaced on the add
 screen as a one-tap chip that fills the Description field. Derived from past
@@ -48,6 +60,7 @@ app and has no login; receives the diary only as a printed Report.
 _Avoid_: nutritionist, doctor, coach, reviewer
 
 **Report**:
-A print-optimised view of the Food Diary over a chosen date range, grouped by
-day. The user prints it to PDF from the browser and hands that to the Dietician.
+A print-optimised view over a chosen date range: a table of Weigh-ins followed
+by the Food Diary grouped by day. The user prints it to PDF from the browser and
+hands that to the Dietician.
 _Avoid_: export, printout, summary
