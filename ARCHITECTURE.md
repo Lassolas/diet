@@ -7,21 +7,23 @@ interface facilitator. See [CONTEXT.md](./CONTEXT.md) for domain vocabulary and
 
 ## Shape
 
-Single SvelteKit project deployed to Cloudflare Pages (ADR 0003).
+Single SvelteKit project (ADR 0003), built with `@sveltejs/adapter-cloudflare`
+for the Cloudflare Workers + static-assets model and deployed via Workers Builds
+(Git integration).
 
 ```
 Browser (responsive web app, home-screen manifest)
    |
    |  fetch, behind Cloudflare Access (see Auth below)
    v
-SvelteKit server routes  =  the API   (src/routes/api/**/+server.ts)
-   |
+Cloudflare Worker: static assets (ASSETS binding) + SvelteKit SSR + API
+   |                                (src/routes/api/**/+server.ts)
    v
 Cloudflare D1 (SQLite) — entries and photo bytes
 ```
 
-Everything runs on the Cloudflare free tier (ADR 0001): Pages, Functions, D1.
-No R2 (ADR 0004). No offline support — the server is the single source of truth.
+Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
+(ADR 0004). No offline support — the server is the single source of truth.
 
 ## Data model
 
@@ -79,5 +81,7 @@ compatibility flag (set in `wrangler.toml`).
 
 ## Deployment
 
-Cloudflare Pages Git integration — push to `main` auto-builds and deploys;
-branches get preview deployments. No separate CI pipeline.
+Cloudflare Workers Builds (Git integration) — push to `main` runs
+`npm run build` and `wrangler deploy`; non-production branches get
+`wrangler versions upload` previews. No separate CI pipeline. Schema changes
+need `npm run db:migrate:remote` run by hand.

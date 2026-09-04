@@ -1,9 +1,13 @@
 name = "diet"
+main = ".svelte-kit/cloudflare/_worker.js"
 compatibility_date = "2024-11-27"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".svelte-kit/cloudflare"
 
-# Database: created once with `wrangler d1 create diet`, then paste the id below.
+[assets]
+directory = ".svelte-kit/cloudflare"
+binding = "ASSETS"
+
+# Database: created once with `wrangler d1 create diet`.
 [[d1_databases]]
 binding = "DB"
 database_name = "diet"

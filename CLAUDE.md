@@ -17,12 +17,13 @@ npx vitest run src/lib/domain/mealType.test.ts   # a single file
 npm run check                # svelte-check + tsc
 npm run dev                  # UI only; API routes return 503 (no CF bindings)
 
-npm run db:migrate:local && npm run build && npm run preview   # full local stack via wrangler
+npm run db:migrate:local && npm run preview       # full local stack (wrangler dev)
 ```
 
-`npm run preview` runs `wrangler pages dev` and reads bindings from
-`wrangler.toml`. Do **not** pass `--d1`/`--r2` flags to it — they point wrangler
-at a different local database than `db:migrate:local` migrates.
+`npm run preview` builds then runs `wrangler dev`, which reads bindings from
+`wrangler.toml` and uses the local D1 that `db:migrate:local` populates. This is
+a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — use
+`wrangler dev`, not `wrangler pages dev`.
 
 ## Architecture notes that span files
 

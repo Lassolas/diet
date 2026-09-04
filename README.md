@@ -22,12 +22,11 @@ npm run check                # svelte-check / types
 npm run dev                  # UI only — API routes 503 without Cloudflare bindings
 ```
 
-To run the whole thing locally (API + D1 + R2) you need Wrangler:
+To run the whole thing locally (API + D1) you need Wrangler:
 
 ```sh
 npm run db:migrate:local     # apply migrations to the local D1
-npm run build
-npm run preview              # wrangler pages dev, serves on http://127.0.0.1:8788
+npm run preview              # builds, then wrangler dev on http://127.0.0.1:8788
 ```
 
 Cloudflare Access verification is skipped locally unless the `CF_ACCESS_*` /
@@ -40,11 +39,14 @@ npx wrangler d1 create diet          # paste the id into wrangler.toml
 npm run db:migrate:remote
 ```
 
-Then connect the repo in the Cloudflare Pages dashboard (build: `npm run build`,
-output: `.svelte-kit/cloudflare`), add an Access application in front of it, and
-set the environment variables.
+Then connect the repo via Cloudflare **Workers Builds** (Workers & Pages →
+create → import Git repo). Build command `npm run build`; the deploy command
+defaults (`wrangler deploy` for production, `wrangler versions upload` for
+branches) work as-is. Enable "Protect with Cloudflare Access" (scope: all
+traffic; policy: your Cloudflare account), then set the `CF_ACCESS_*` /
+`ALLOWED_EMAIL` variables (see `.dev.vars.example`) and redeploy.
 
 ## Deploy
 
-Push to `main`. Cloudflare Pages builds and deploys automatically. Schema
-changes need `npm run db:migrate:remote` run by hand.
+Push to `main`. Workers Builds runs `npm run build` and deploys automatically.
+Schema changes need `npm run db:migrate:remote` run by hand.
