@@ -65,7 +65,7 @@
 	<span class="lbl">Conditions</span>
 	<div class="toggles">
 		<button type="button" class:on={fasted} aria-pressed={fasted} onclick={() => (fasted = !fasted)}>
-			{fasted ? 'À jeun' : 'Pas à jeun'}
+			À jeun
 		</button>
 		<button
 			type="button"
@@ -73,7 +73,7 @@
 			aria-pressed={clothed}
 			onclick={() => (clothed = !clothed)}
 		>
-			{clothed ? 'Habillé' : 'Pas habillé'}
+			Habillé
 		</button>
 	</div>
 

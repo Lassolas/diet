@@ -8,10 +8,10 @@ export const MEAL_TYPE_LABEL: Record<MealType, string> = {
 	snack: 'Collation'
 };
 
-/** Short French summary of a weigh-in's conditions, e.g. "à jeun · habillé". */
+/** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {
 	const parts: string[] = [];
-	parts.push(w.fasted ? 'à jeun' : 'pas à jeun');
-	parts.push(w.clothed ? 'habillé' : 'pas habillé');
-	return parts.join(' · ');
+	if (w.fasted) parts.push('à jeun');
+	if (w.clothed) parts.push('habillé');
+	return parts.length ? parts.join(' · ') : '—';
 }

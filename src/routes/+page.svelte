@@ -59,6 +59,13 @@
 	{/each}
 {/if}
 
+<a class="fab fab-scale" href="/poids/add" aria-label="Nouvelle pesée">
+	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+		<rect x="4" y="3" width="16" height="18" rx="2" />
+		<path d="M8.5 9a3.5 3.5 0 0 1 7 0" />
+		<path d="M12 9l2-2" />
+	</svg>
+</a>
 <a class="fab" href="/add" aria-label="Ajouter un repas">+</a>
 
 <style>
@@ -146,5 +153,18 @@
 		text-align: center;
 		text-decoration: none;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	}
+	.fab-scale {
+		bottom: 92px; /* stacked above the + */
+		background: var(--surface);
+		color: var(--accent);
+		border: 1px solid var(--border);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.fab-scale svg {
+		width: 26px;
+		height: 26px;
 	}
 </style>
