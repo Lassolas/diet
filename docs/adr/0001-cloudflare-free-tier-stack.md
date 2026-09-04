@@ -11,8 +11,12 @@ VM, which is not free.
 ## Consequences
 
 - The data layer is bound to Cloudflare primitives (D1's SQLite dialect,
-  R2's S3-ish API, the Workers runtime). Migrating off is a rewrite of the
-  persistence code.
-- Photos must be resized client-side before upload to stay comfortably
-  inside R2's free storage.
+  the Workers runtime). Migrating off is a rewrite of the persistence code.
+- Photos must be resized client-side before upload to stay small.
 - The owner is learning Cloudflare during the project; expect some ramp-up.
+
+## Update
+
+R2 turned out to require a payment card even for its free allowance, which
+breaks the "no card" premise. Photos are stored in D1 instead — see ADR 0004.
+The rest of this decision stands.

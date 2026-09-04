@@ -7,10 +7,5 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 [[d1_databases]]
 binding = "DB"
 database_name = "diet"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
+database_id = "e9fbf1d3-5a6c-4b25-a6f0-f7be8e90a278"
 migrations_dir = "migrations"
-
-# Photo storage: created once with `wrangler r2 bucket create diet-photos`.
-[[r2_buckets]]
-binding = "PHOTOS"
-bucket_name = "diet-photos"

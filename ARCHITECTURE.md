@@ -15,13 +15,13 @@ Browser (responsive web app, home-screen manifest)
    |  fetch, behind Cloudflare Access (see Auth below)
    v
 SvelteKit server routes  =  the API   (src/routes/api/**/+server.ts)
-   |                         |
-   v                         v
-Cloudflare D1 (SQLite)    Cloudflare R2 (meal photos)
+   |
+   v
+Cloudflare D1 (SQLite) — entries and photo bytes
 ```
 
-Everything runs on the Cloudflare free tier (ADR 0001): Pages, Functions, D1,
-R2. No offline support — the server is the single source of truth.
+Everything runs on the Cloudflare free tier (ADR 0001): Pages, Functions, D1.
+No R2 (ADR 0004). No offline support — the server is the single source of truth.
 
 ## Data model
 
@@ -29,10 +29,10 @@ R2. No offline support — the server is the single source of truth.
   wall-clock — ADR 0002), `meal_type` (`breakfast|lunch|dinner|snack`),
   `description` (nullable), `note` (nullable), `created_at`, `updated_at`.
   A row must have a `description` or at least one photo.
-- `photo`: `id` (ULID), `meal_entry_id` (FK, cascade delete), `r2_key`,
-  `position`, `created_at`. Max 5 per entry.
-- R2 objects at `photos/{meal_entry_id}/{photo_id}.jpg`. Entry delete removes
-  the rows, then best-effort deletes the R2 objects.
+- `photo`: `id` (ULID), `meal_entry_id` (FK, cascade delete), `bytes` (BLOB —
+  the resized JPEG, ADR 0004), `content_type`, `position`, `created_at`.
+  Max 5 per entry. List/get queries select photo metadata only, never `bytes`.
+- Entry delete cascades to its photo rows in SQL.
 
 Migrations are Wrangler D1 migration files in `migrations/`, applied manually.
 Backup relies on D1 Time Travel, plus a manual `wrangler d1 export` before risky
@@ -45,10 +45,10 @@ REST-ish, all under `/api` and gated by Cloudflare Access:
 - `GET /api/entries?from=&to=` · `POST /api/entries`
 - `GET|PATCH|DELETE /api/entries/:id`
 - `POST /api/entries/:id/photos` (receives an already-resized JPEG blob,
-  streams to R2) · `DELETE /api/photos/:id`
+  stored inline in D1) · `DELETE /api/photos/:id`
 - `GET /api/frequent-items?mealType=` — SQL aggregate ranking past
   Descriptions by frequency and recency
-- `GET /photos/:key` — streams from R2 with a long cache header
+- `GET /photos/:id` — reads the blob from D1, long cache header
 
 The Report is not a server feature: the frontend calls `GET /api/entries` for a
 date range and renders a print layout.

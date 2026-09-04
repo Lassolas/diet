@@ -27,11 +27,14 @@ at a different local database than `db:migrate:local` migrates.
 ## Architecture notes that span files
 
 - **API = SvelteKit server routes** under `src/routes/api/**`, plus the photo
-  stream at `src/routes/photos/[...key]`. All of it is gated by
+  stream at `src/routes/photos/[id]`. All of it is gated by
   `src/hooks.server.ts` (Cloudflare Access JWT check, no-op when unconfigured).
-- **Persistence** is `src/lib/server/repo.ts` only — the D1/R2 calls live there
+- **Persistence** is `src/lib/server/repo.ts` only — the D1 calls live there
   and nowhere else. Routes call the repo; the repo maps rows to the `MealEntry`
   shape in `src/lib/types.ts`.
+- **Photos live in D1** as BLOBs (ADR 0004), not R2. Never `SELECT` the `bytes`
+  column in a list query — `repo.ts` selects photo metadata only and fetches
+  bytes one row at a time via `getPhotoBytes`.
 - **Domain logic is pure and tested**: `mealType`, `frequentItems`,
   `validateEntry`, `reportGrouping` under `src/lib/domain/`. Both the client
   (`EntryForm`) and the server routes import the same functions. Change behaviour
@@ -40,8 +43,8 @@ at a different local database than `db:migrate:local` migrates.
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.
 - **Photos** are resized client-side in `src/lib/photo.ts` before upload; the
-  upload route stores the raw JPEG in R2 and a `photo` row in D1. Entry delete
-  cascades in SQL and best-effort deletes the R2 objects.
+  upload route stores the JPEG bytes in the `photo` row. Entry delete cascades
+  to photo rows in SQL.
 - **Vitest uses its own config** (`vitest.config.ts`) that deliberately omits the
   SvelteKit Vite plugin — the plugin crashes under Vitest. Keep domain tests
   free of SvelteKit imports.

@@ -12,10 +12,14 @@ CREATE TABLE meal_entry (
 
 CREATE INDEX idx_meal_entry_eaten_at ON meal_entry (eaten_at);
 
+-- Photos are stored inline as BLOBs (ADR 0004): keeps the app on the fully
+-- card-free Cloudflare free tier. Client resizes to ~150-250KB JPEG first;
+-- D1's per-value ceiling is 2 MB.
 CREATE TABLE photo (
 	id            TEXT PRIMARY KEY,         -- ULID
 	meal_entry_id TEXT NOT NULL REFERENCES meal_entry (id) ON DELETE CASCADE,
-	r2_key        TEXT NOT NULL,
+	bytes         BLOB NOT NULL,
+	content_type  TEXT NOT NULL DEFAULT 'image/jpeg',
 	position      INTEGER NOT NULL DEFAULT 0,
 	created_at    TEXT NOT NULL
 );

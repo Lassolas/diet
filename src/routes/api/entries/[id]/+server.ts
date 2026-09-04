@@ -26,9 +26,7 @@ export const PATCH: RequestHandler = async (event) => {
 };
 
 export const DELETE: RequestHandler = async (event) => {
-	const { DB, PHOTOS } = env(event);
-	const keys = await deleteEntry(DB, event.params.id!);
-	// Best-effort R2 cleanup; a stray orphan object is harmless.
-	await Promise.allSettled(keys.map((k) => PHOTOS.delete(k)));
+	// Photo rows cascade with the entry (ON DELETE CASCADE).
+	await deleteEntry(env(event).DB, event.params.id!);
 	return new Response(null, { status: 204 });
 };

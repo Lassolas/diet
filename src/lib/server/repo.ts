@@ -19,24 +19,21 @@ interface EntryRow {
 	updated_at: string;
 }
 
-interface PhotoRow {
+interface PhotoMetaRow {
 	id: string;
 	meal_entry_id: string;
-	r2_key: string;
+	content_type: string;
 	position: number;
 	created_at: string;
 }
 
-/** R2 object key for a photo. Also its path under the `/photos/` route. */
-export const photoKey = (entryId: string, photoId: string) => `${entryId}/${photoId}.jpg`;
-
-const toPhoto = (row: PhotoRow): Photo => ({
+const toPhoto = (row: PhotoMetaRow): Photo => ({
 	id: row.id,
 	position: row.position,
-	url: `/photos/${row.r2_key}`
+	url: `/photos/${row.id}`
 });
 
-const toEntry = (row: EntryRow, photos: PhotoRow[]): MealEntry => ({
+const toEntry = (row: EntryRow, photos: PhotoMetaRow[]): MealEntry => ({
 	id: row.id,
 	eatenAt: row.eaten_at,
 	mealType: row.meal_type,
@@ -50,6 +47,10 @@ const toEntry = (row: EntryRow, photos: PhotoRow[]): MealEntry => ({
 	updatedAt: row.updated_at
 });
 
+// Never SELECT the `bytes` column when listing — it would pull every photo's
+// blob into memory. Photo bytes are fetched one at a time by getPhotoBytes.
+const PHOTO_META_COLS = 'id, meal_entry_id, content_type, position, created_at';
+
 export async function listEntries(
 	db: D1Database,
 	range: { from?: string; to?: string } = {}
@@ -61,7 +62,6 @@ export async function listEntries(
 		binds.push(range.from);
 	}
 	if (range.to) {
-		// `to` is a date; include the whole day.
 		clauses.push('eaten_at <= ?');
 		binds.push(`${range.to}T23:59`);
 	}
@@ -77,10 +77,11 @@ export async function listEntries(
 	const ids = rows.map((r) => r.id);
 	const photos = await db
 		.prepare(
-			`SELECT * FROM photo WHERE meal_entry_id IN (${ids.map(() => '?').join(',')}) ORDER BY position`
+			`SELECT ${PHOTO_META_COLS} FROM photo
+			 WHERE meal_entry_id IN (${ids.map(() => '?').join(',')}) ORDER BY position`
 		)
 		.bind(...ids)
-		.all<PhotoRow>();
+		.all<PhotoMetaRow>();
 
 	return rows.map((row) => toEntry(row, photos.results ?? []));
 }
@@ -89,9 +90,9 @@ export async function getEntry(db: D1Database, id: string): Promise<MealEntry | 
 	const row = await db.prepare('SELECT * FROM meal_entry WHERE id = ?').bind(id).first<EntryRow>();
 	if (!row) return null;
 	const photos = await db
-		.prepare('SELECT * FROM photo WHERE meal_entry_id = ? ORDER BY position')
+		.prepare(`SELECT ${PHOTO_META_COLS} FROM photo WHERE meal_entry_id = ? ORDER BY position`)
 		.bind(id)
-		.all<PhotoRow>();
+		.all<PhotoMetaRow>();
 	return toEntry(row, photos.results ?? []);
 }
 
@@ -141,14 +142,9 @@ export async function updateEntry(
 	return getEntry(db, id);
 }
 
-/** Deletes an entry and returns the R2 keys of its photos, for the caller to clean up. */
-export async function deleteEntry(db: D1Database, id: string): Promise<string[]> {
-	const photos = await db
-		.prepare('SELECT r2_key FROM photo WHERE meal_entry_id = ?')
-		.bind(id)
-		.all<{ r2_key: string }>();
+/** Deletes an entry; photo rows go with it via ON DELETE CASCADE. */
+export async function deleteEntry(db: D1Database, id: string): Promise<void> {
 	await db.prepare('DELETE FROM meal_entry WHERE id = ?').bind(id).run();
-	return (photos.results ?? []).map((p) => p.r2_key);
 }
 
 export async function countPhotos(db: D1Database, entryId: string): Promise<number> {
@@ -162,9 +158,10 @@ export async function countPhotos(db: D1Database, entryId: string): Promise<numb
 export async function addPhoto(
 	db: D1Database,
 	entryId: string,
-	id: string,
-	r2Key: string
+	bytes: ArrayBuffer,
+	contentType = 'image/jpeg'
 ): Promise<Photo> {
+	const id = ulid();
 	const posRow = await db
 		.prepare('SELECT COALESCE(MAX(position), -1) AS p FROM photo WHERE meal_entry_id = ?')
 		.bind(entryId)
@@ -172,22 +169,31 @@ export async function addPhoto(
 	const position = (posRow?.p ?? -1) + 1;
 	await db
 		.prepare(
-			`INSERT INTO photo (id, meal_entry_id, r2_key, position, created_at) VALUES (?, ?, ?, ?, ?)`
+			`INSERT INTO photo (id, meal_entry_id, bytes, content_type, position, created_at)
+			 VALUES (?, ?, ?, ?, ?, ?)`
 		)
-		.bind(id, entryId, r2Key, position, new Date().toISOString())
+		.bind(id, entryId, bytes, contentType, position, new Date().toISOString())
 		.run();
-	return { id, position, url: `/photos/${r2Key}` };
+	return { id, position, url: `/photos/${id}` };
 }
 
-/** Deletes a photo row and returns its R2 key, or null if it did not exist. */
-export async function deletePhoto(db: D1Database, photoId: string): Promise<string | null> {
+/** Deletes a photo row. Returns false if it did not exist. */
+export async function deletePhoto(db: D1Database, photoId: string): Promise<boolean> {
+	const res = await db.prepare('DELETE FROM photo WHERE id = ?').bind(photoId).run();
+	return (res.meta.changes ?? 0) > 0;
+}
+
+export async function getPhotoBytes(
+	db: D1Database,
+	photoId: string
+): Promise<{ bytes: ArrayBuffer; contentType: string } | null> {
 	const row = await db
-		.prepare('SELECT r2_key FROM photo WHERE id = ?')
+		.prepare('SELECT bytes, content_type FROM photo WHERE id = ?')
 		.bind(photoId)
-		.first<{ r2_key: string }>();
+		.first<{ bytes: ArrayBuffer | number[]; content_type: string }>();
 	if (!row) return null;
-	await db.prepare('DELETE FROM photo WHERE id = ?').bind(photoId).run();
-	return row.r2_key;
+	const bytes = Array.isArray(row.bytes) ? new Uint8Array(row.bytes).buffer : row.bytes;
+	return { bytes, contentType: row.content_type };
 }
 
 export { MAX_PHOTOS_PER_ENTRY };

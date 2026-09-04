@@ -9,7 +9,6 @@ declare global {
 		interface Platform {
 			env: {
 				DB: import('@cloudflare/workers-types').D1Database;
-				PHOTOS: import('@cloudflare/workers-types').R2Bucket;
 			};
 			cf?: import('@cloudflare/workers-types').CfProperties;
 			ctx?: import('@cloudflare/workers-types').ExecutionContext;

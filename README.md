@@ -9,8 +9,9 @@ for the design, and [docs/adr/](./docs/adr/) for the decisions behind it.
 
 ## Stack
 
-SvelteKit on the Cloudflare free tier: Pages (frontend + API as server routes),
-D1 (SQLite), R2 (photos). See ADR 0001 and 0003.
+SvelteKit on the Cloudflare free tier: Pages (frontend + API as server routes)
+and D1 (SQLite) — meal entries and photo bytes both live in D1. No R2, no
+payment card. See ADR 0001, 0003, 0004.
 
 ## Develop
 
@@ -36,7 +37,6 @@ Cloudflare Access verification is skipped locally unless the `CF_ACCESS_*` /
 
 ```sh
 npx wrangler d1 create diet          # paste the id into wrangler.toml
-npx wrangler r2 bucket create diet-photos
 npm run db:migrate:remote
 ```
 
