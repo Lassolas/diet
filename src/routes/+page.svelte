@@ -67,8 +67,16 @@
 
 <div class="fabs">
 	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
-	<a class="fab mini" href="/dicter?type=collation" title="Collation à la voix" aria-label="Collation à la voix">🍌</a>
-	<a class="fab mini" href="/dicter" title="Repas à la voix" aria-label="Repas à la voix">🍽️</a>
+	<a class="fab mini voice" href="/dicter?type=collation" title="Collation à la voix" aria-label="Collation à la voix">
+		<span class="ripple"></span>
+		<span class="ripple delay"></span>
+		🍌
+	</a>
+	<a class="fab mini voice" href="/dicter" title="Repas à la voix" aria-label="Repas à la voix">
+		<span class="ripple"></span>
+		<span class="ripple delay"></span>
+		🍽️
+	</a>
 	<a class="fab add" href="/add" aria-label="Ajouter un repas">+</a>
 </div>
 
@@ -176,5 +184,34 @@
 		background: var(--surface);
 		border: 1px solid var(--border);
 		font-size: 1.3rem;
+	}
+	.fab.voice {
+		position: relative;
+	}
+	.fab.voice .ripple {
+		position: absolute;
+		inset: 0;
+		border-radius: 999px;
+		border: 2px solid var(--accent);
+		pointer-events: none;
+		opacity: 0; /* reduced-motion fallback: no static ring */
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.fab.voice .ripple {
+			animation: ripple 2.4s ease-out infinite;
+		}
+		.fab.voice .ripple.delay {
+			animation-delay: 1.2s;
+		}
+	}
+	@keyframes ripple {
+		0% {
+			transform: scale(1);
+			opacity: 0.55;
+		}
+		100% {
+			transform: scale(1.6);
+			opacity: 0;
+		}
 	}
 </style>
