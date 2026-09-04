@@ -10,7 +10,10 @@
 	import MealTypePicker from './MealTypePicker.svelte';
 	import VoiceInput from './VoiceInput.svelte';
 
-	let { entry }: { entry?: MealEntry } = $props();
+	let {
+		entry,
+		initialMealType
+	}: { entry?: MealEntry; initialMealType?: MealType | null } = $props();
 
 	// `entry` is fixed for this component's lifetime: the edit page remounts the
 	// form via {#key entry.id}. Seed the form fields from it once.
@@ -18,7 +21,7 @@
 		return {
 			editing: e !== undefined,
 			eatenAt: e?.eatenAt ?? nowLocalInput(),
-			mealType: e?.mealType ?? mealTypeForTime(new Date()),
+			mealType: e?.mealType ?? initialMealType ?? mealTypeForTime(new Date()),
 			description: e?.description ?? '',
 			note: e?.note ?? '',
 			photos: e ? [...e.photos] : []

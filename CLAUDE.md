@@ -37,9 +37,13 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   column in a list query — `repo.ts` selects photo metadata only and fetches
   bytes one row at a time via `getPhotoBytes`.
 - **Domain logic is pure and tested**: `mealType`, `frequentItems`,
-  `validateEntry`, `validateWeighIn`, `reportGrouping` under `src/lib/domain/`.
-  Both the client (`EntryForm` / `WeighInForm`) and the server routes import the
-  same functions. Change behaviour here test-first.
+  `validateEntry`, `validateWeighIn`, `interpretTranscript`, `reportTimeline`
+  under `src/lib/domain/`. Both the client (`EntryForm` / `WeighInForm`) and the
+  server routes import the same functions. Change behaviour here test-first.
+- **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR). The
+  `/dicter` route auto-starts dictation and creates an entry from the transcript
+  + time-of-day meal type. No server-side transcription. The home 🍽️/🍌 FABs
+  point here; `?type=collation` forces the Snack meal type.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the

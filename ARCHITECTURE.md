@@ -68,10 +68,17 @@ The Report is not a server feature: the frontend calls `GET /api/entries` and
 - `rankFrequentItems(entries, mealType)` — frequency x recency
 - `validateEntry(input)` — the description-or-photo rule
 - `validateWeighIn(input)` — weight range, time format, condition
-- Report date grouping (including empty days shown as "no entries logged")
+- `interpretTranscript(text, confidence)` — dictation usable vs re-ask
+- `buildReportTimeline(entries, weighIns, from, to)` — one time-sorted stream
+  per day across the range, empty days included
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 ~0.72, via `<canvas>`, no library.
+
+Voice: `src/lib/voice.ts` wraps the browser `SpeechRecognition` API (fr-FR,
+feature-detected). `/dicter` auto-starts it, creates the entry from the
+transcript + time-of-day meal type, and lands on the entry's edit page.
+`EntryForm` also has an inline dictate button. No server component.
 
 ## Auth
 

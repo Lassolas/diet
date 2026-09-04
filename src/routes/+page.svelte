@@ -29,7 +29,7 @@
 {#if data.loadError}
 	<p class="error">{data.loadError}</p>
 {:else if data.entries.length === 0}
-	<p class="empty">Aucun repas enregistré. Touche « + » pour commencer.</p>
+	<p class="empty">Aucun repas enregistré. Touche 🍽️ pour dicter le premier.</p>
 {:else}
 	{#each days as day (day.date)}
 		<section>
@@ -59,14 +59,17 @@
 	{/each}
 {/if}
 
-<a class="fab fab-scale" href="/poids/add" aria-label="Nouvelle pesée">
-	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-		<rect x="4" y="3" width="16" height="18" rx="2" />
-		<path d="M8.5 9a3.5 3.5 0 0 1 7 0" />
-		<path d="M12 9l2-2" />
-	</svg>
-</a>
-<a class="fab" href="/add" aria-label="Ajouter un repas">+</a>
+<div class="fabs">
+	<a class="fab scale" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<rect x="4" y="3" width="16" height="18" rx="2" />
+			<path d="M8.5 9a3.5 3.5 0 0 1 7 0" />
+			<path d="M12 9l2-2" />
+		</svg>
+	</a>
+	<a class="fab snack" href="/dicter?type=collation" title="Ajouter une collation (voix)" aria-label="Ajouter une collation">🍌</a>
+	<a class="fab meal" href="/dicter" title="Ajouter un repas (voix)" aria-label="Ajouter un repas">🍽️</a>
+</div>
 
 <style>
 	header {
@@ -139,32 +142,46 @@
 		object-fit: cover;
 		border-radius: 6px;
 	}
-	.fab {
+	.fabs {
 		position: fixed;
 		right: max(16px, calc(50vw - 320px + 16px));
 		bottom: 24px;
-		width: 56px;
-		height: 56px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+	}
+	.fab {
 		border-radius: 999px;
 		background: var(--accent);
 		color: var(--accent-text);
-		font-size: 2rem;
-		line-height: 56px;
-		text-align: center;
 		text-decoration: none;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-	}
-	.fab-scale {
-		bottom: 92px; /* stacked above the + */
-		background: var(--surface);
-		color: var(--accent);
-		border: 1px solid var(--border);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
-	.fab-scale svg {
-		width: 26px;
-		height: 26px;
+	.fab.meal {
+		width: 60px;
+		height: 60px;
+		font-size: 1.8rem;
+	}
+	.fab.snack {
+		width: 52px;
+		height: 52px;
+		font-size: 1.5rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+	}
+	.fab.scale {
+		width: 48px;
+		height: 48px;
+		background: var(--surface);
+		color: var(--accent);
+		border: 1px solid var(--border);
+	}
+	.fab.scale svg {
+		width: 24px;
+		height: 24px;
 	}
 </style>

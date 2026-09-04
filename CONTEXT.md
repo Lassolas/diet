@@ -60,7 +60,13 @@ app and has no login; receives the diary only as a printed Report.
 _Avoid_: nutritionist, doctor, coach, reviewer
 
 **Report**:
-A print-optimised view over a chosen date range: a table of Weigh-ins followed
-by the Food Diary grouped by day. The user prints it to PDF from the browser and
-hands that to the Dietician.
+A print-optimised view over a chosen date range: one chronological stream per
+day with Weigh-ins and Meal Entries interleaved by time. The user prints it to
+PDF from the browser and hands that to the Dietician.
 _Avoid_: export, printout, summary
+
+**Dictation**:
+Speaking a Meal Entry's Description instead of typing it. The browser transcribes
+the speech; the text is accepted only if it is non-empty, not pure filler, and
+above a confidence threshold — otherwise the user is asked to say it again.
+_Avoid_: voice note, recording, transcription
