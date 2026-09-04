@@ -167,8 +167,16 @@
 	</div>
 	{#if canAddPhoto}
 		<label class="btn file-btn">
-			{busyPhoto ? 'Traitement…' : 'Ajouter une photo'}
-			<input type="file" accept="image/*" multiple hidden onchange={onFiles} disabled={busyPhoto} />
+			{busyPhoto ? 'Traitement…' : 'Prendre une photo'}
+			<!-- capture="environment" opens the rear camera directly on mobile -->
+			<input
+				type="file"
+				accept="image/*"
+				capture="environment"
+				hidden
+				onchange={onFiles}
+				disabled={busyPhoto}
+			/>
 		</label>
 	{/if}
 
