@@ -1,21 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { buildTimeline } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL } from '$lib/ui';
-	import type { MealEntry } from '$lib/types';
+	import { MEAL_TYPE_LABEL, conditionSummary } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
-	const days = $derived.by(() => {
-		const groups: { date: string; entries: MealEntry[] }[] = [];
-		for (const entry of data.entries) {
-			const date = entry.eatenAt.slice(0, 10);
-			const last = groups.at(-1);
-			if (last?.date === date) last.entries.push(entry);
-			else groups.push({ date, entries: [entry] });
-		}
-		return groups;
-	});
+	// Newest day first, and within a day, newest first.
+	const days = $derived(buildTimeline(data.entries, data.weighIns, { order: 'desc' }));
 </script>
 
 <header>
@@ -28,31 +20,45 @@
 
 {#if data.loadError}
 	<p class="error">{data.loadError}</p>
-{:else if data.entries.length === 0}
-	<p class="empty">Aucun repas enregistré. Touche 🍽️ pour dicter le premier.</p>
+{:else if days.length === 0}
+	<p class="empty">Rien d'enregistré. Touche « + » ou 🍽️ pour commencer.</p>
 {:else}
 	{#each days as day (day.date)}
 		<section>
 			<h2>{formatDay(day.date)}</h2>
 			<ul>
-				{#each day.entries as entry (entry.id)}
-					<li>
-						<a href="/entry/{entry.id}">
-							<div class="row">
-								<span class="time">{formatTime(entry.eatenAt)}</span>
-								<span class="type">{MEAL_TYPE_LABEL[entry.mealType]}</span>
-							</div>
-							{#if entry.description}<p class="desc">{entry.description}</p>{/if}
-							{#if entry.note}<p class="note">{entry.note}</p>{/if}
-							{#if entry.photos.length}
-								<div class="thumbs">
-									{#each entry.photos as photo (photo.id)}
-										<img src={photo.url} alt="" />
-									{/each}
+				{#each day.items as item (item.kind + item.at + (item.kind === 'meal' ? item.entry.id : item.weighIn.id))}
+					{#if item.kind === 'weighIn'}
+						<li>
+							<a href="/poids/{item.weighIn.id}" class="weigh">
+								<div class="row">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="type">Poids</span>
 								</div>
-							{/if}
-						</a>
-					</li>
+								<p class="desc">
+									{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}
+								</p>
+							</a>
+						</li>
+					{:else}
+						<li>
+							<a href="/entry/{item.entry.id}">
+								<div class="row">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="type">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
+								</div>
+								{#if item.entry.description}<p class="desc">{item.entry.description}</p>{/if}
+								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
+								{#if item.entry.photos.length}
+									<div class="thumbs">
+										{#each item.entry.photos as photo (photo.id)}
+											<img src={photo.url} alt="" />
+										{/each}
+									</div>
+								{/if}
+							</a>
+						</li>
+					{/if}
 				{/each}
 			</ul>
 		</section>
@@ -60,15 +66,10 @@
 {/if}
 
 <div class="fabs">
-	<a class="fab scale" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">
-		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-			<rect x="4" y="3" width="16" height="18" rx="2" />
-			<path d="M8.5 9a3.5 3.5 0 0 1 7 0" />
-			<path d="M12 9l2-2" />
-		</svg>
-	</a>
-	<a class="fab snack" href="/dicter?type=collation" title="Ajouter une collation (voix)" aria-label="Ajouter une collation">🍌</a>
-	<a class="fab meal" href="/dicter" title="Ajouter un repas (voix)" aria-label="Ajouter un repas">🍽️</a>
+	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
+	<a class="fab mini" href="/dicter?type=collation" title="Collation à la voix" aria-label="Collation à la voix">🍌</a>
+	<a class="fab mini" href="/dicter" title="Repas à la voix" aria-label="Repas à la voix">🍽️</a>
+	<a class="fab add" href="/add" aria-label="Ajouter un repas">+</a>
 </div>
 
 <style>
@@ -113,6 +114,9 @@
 		text-decoration: none;
 		color: var(--text);
 	}
+	li a.weigh {
+		border-left: 3px solid var(--accent);
+	}
 	.row {
 		display: flex;
 		gap: 10px;
@@ -149,39 +153,28 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 12px;
+		gap: 10px;
 	}
 	.fab {
 		border-radius: 999px;
-		background: var(--accent);
-		color: var(--accent-text);
 		text-decoration: none;
 		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
-	.fab.meal {
+	.fab.add {
 		width: 60px;
 		height: 60px;
-		font-size: 1.8rem;
+		background: var(--accent);
+		color: var(--accent-text);
+		font-size: 2rem;
 	}
-	.fab.snack {
-		width: 52px;
-		height: 52px;
-		font-size: 1.5rem;
+	.fab.mini {
+		width: 46px;
+		height: 46px;
 		background: var(--surface);
 		border: 1px solid var(--border);
-	}
-	.fab.scale {
-		width: 48px;
-		height: 48px;
-		background: var(--surface);
-		color: var(--accent);
-		border: 1px solid var(--border);
-	}
-	.fab.scale svg {
-		width: 24px;
-		height: 24px;
+		font-size: 1.3rem;
 	}
 </style>

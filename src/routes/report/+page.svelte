@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
-	import { buildReportTimeline } from '$lib/domain/reportTimeline';
+	import { buildTimeline } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
 	import { MEAL_TYPE_LABEL, conditionSummary } from '$lib/ui';
 
@@ -14,7 +14,9 @@
 	let to = $state(range.to);
 	let withPhotos = $state(true);
 
-	const days = $derived(buildReportTimeline(data.entries, data.weighIns, data.from, data.to));
+	const days = $derived(
+		buildTimeline(data.entries, data.weighIns, { from: data.from, to: data.to })
+	);
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'

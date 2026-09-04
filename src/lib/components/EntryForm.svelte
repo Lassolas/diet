@@ -176,11 +176,25 @@
 		{/each}
 	</div>
 	{#if canAddPhoto}
-		<label class="btn file-btn">
-			{busyPhoto ? 'Traitement…' : 'Ajouter une photo'}
-			<!-- No `capture` attr: mobile then offers "Take Photo" vs "Photo Library" -->
-			<input type="file" accept="image/*" multiple hidden onchange={onFiles} disabled={busyPhoto} />
-		</label>
+		<div class="photo-actions">
+			<label class="btn file-btn">
+				{busyPhoto ? 'Traitement…' : '📷 Prendre'}
+				<!-- capture forces the camera -->
+				<input
+					type="file"
+					accept="image/*"
+					capture="environment"
+					hidden
+					onchange={onFiles}
+					disabled={busyPhoto}
+				/>
+			</label>
+			<label class="btn file-btn">
+				Choisir
+				<!-- no capture: the photo library -->
+				<input type="file" accept="image/*" multiple hidden onchange={onFiles} disabled={busyPhoto} />
+			</label>
+		</div>
 	{/if}
 
 	{#if errorMsg}<p class="error">{errorMsg}</p>{/if}
@@ -238,9 +252,13 @@
 		line-height: 1;
 		background: var(--surface);
 	}
-	.file-btn {
-		display: inline-block;
+	.photo-actions {
+		display: flex;
+		gap: 8px;
 		margin-top: 10px;
+	}
+	.file-btn {
+		flex: 1;
 		text-align: center;
 	}
 	.actions {

@@ -69,8 +69,10 @@ The Report is not a server feature: the frontend calls `GET /api/entries` and
 - `validateEntry(input)` — the description-or-photo rule
 - `validateWeighIn(input)` — weight range, time format, condition
 - `interpretTranscript(text, confidence)` — dictation usable vs re-ask
-- `buildReportTimeline(entries, weighIns, from, to)` — one time-sorted stream
-  per day across the range, empty days included
+- `buildTimeline(entries, weighIns, options)` — merges meals and weigh-ins into
+  one time-sorted stream per day. The Report calls it with `{ from, to }`
+  (ascending, empty days included); the journal calls it with
+  `{ order: 'desc' }` (newest day and newest item first, no empty days)
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 ~0.72, via `<canvas>`, no library.

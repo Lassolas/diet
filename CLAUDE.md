@@ -40,6 +40,9 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   `validateEntry`, `validateWeighIn`, `interpretTranscript`, `reportTimeline`
   under `src/lib/domain/`. Both the client (`EntryForm` / `WeighInForm`) and the
   server routes import the same functions. Change behaviour here test-first.
+  `buildTimeline` merges meals and weigh-ins by day for both the journal
+  (`+page.svelte`, newest-first, no empty days) and the Report (ascending,
+  empty days shown) — one function, different options.
 - **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR). The
   `/dicter` route auto-starts dictation and creates an entry from the transcript
   + time-of-day meal type. No server-side transcription. The home 🍽️/🍌 FABs
