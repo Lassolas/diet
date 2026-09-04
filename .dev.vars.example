@@ -1,0 +1,7 @@
+# Copy to `.dev.vars` for local runs, or set as Pages environment variables in
+# production. When all three are unset, Cloudflare Access verification is
+# skipped (fine for local dev).
+
+CF_ACCESS_TEAM_DOMAIN=yourteam.cloudflareaccess.com
+CF_ACCESS_AUD=your-access-application-aud-tag
+ALLOWED_EMAIL=you@example.com

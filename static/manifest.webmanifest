@@ -1,0 +1,14 @@
+{
+	"name": "Journal alimentaire",
+	"short_name": "Journal",
+	"description": "Journal des repas à présenter au diététicien",
+	"start_url": "/",
+	"scope": "/",
+	"display": "standalone",
+	"background_color": "#f7f6f3",
+	"theme_color": "#3a7d44",
+	"lang": "fr",
+	"icons": [
+		{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+	]
+}
