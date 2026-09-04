@@ -1,11 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-	<rect width="512" height="512" rx="96" fill="#3a7d44" />
-	<path
-		d="M186 96c0 0-14 92-14 132 0 30 20 46 44 50l-8 138h32l-8-138c24-4 44-20 44-50 0-40-14-132-14-132h-18l4 108h-14l-6-108h-16l-6 108h-14l4-108z"
-		fill="#ffffff"
-	/>
-	<path
-		d="M320 96c-26 0-42 40-42 96 0 42 18 70 42 74l-8 182h30l-8-352z"
-		fill="#ffffff"
-	/>
+	<!-- Full-bleed background: no self-rounding, so Android's maskable crop and
+	     iOS's own squircle mask both apply cleanly. All white shapes below sit
+	     inside the maskable "safe zone" (radius 0.4 * 512 from center). -->
+	<rect width="512" height="512" fill="#3a7d44" />
+
+	<!-- Fork -->
+	<rect x="170" y="216" width="32" height="196" rx="16" fill="#ffffff" />
+	<rect x="148" y="180" width="76" height="40" rx="14" fill="#ffffff" />
+	<rect x="152" y="90" width="12" height="100" rx="6" fill="#ffffff" />
+	<rect x="172" y="90" width="12" height="100" rx="6" fill="#ffffff" />
+	<rect x="192" y="90" width="12" height="100" rx="6" fill="#ffffff" />
+	<rect x="212" y="90" width="12" height="100" rx="6" fill="#ffffff" />
+
+	<!-- Spoon -->
+	<rect x="310" y="216" width="32" height="196" rx="16" fill="#ffffff" />
+	<ellipse cx="326" cy="168" rx="44" ry="60" fill="#ffffff" />
 </svg>
