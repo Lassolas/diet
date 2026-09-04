@@ -42,7 +42,10 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   same functions. Change behaviour here test-first.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
-  list/add/edit pages). Not linked to `meal_entry`.
+  list/add/edit pages). Not linked to `meal_entry`. Weight input is the
+  `WeightWheel` component (CSS scroll-snap 0.1 kg picker); a new weigh-in
+  defaults to the last recorded weight (loaded in `poids/add/+page.ts`).
+  Conditions are two independent booleans (`fasted`, `clothed`).
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.

@@ -7,7 +7,6 @@ import {
 	type MealType,
 	type Photo,
 	type WeighIn,
-	type WeighInCondition,
 	type WeighInInput
 } from '$lib/types';
 import type { FrequentItemSource } from '$lib/domain/frequentItems';
@@ -207,7 +206,8 @@ interface WeighInRow {
 	id: string;
 	measured_at: string;
 	weight_kg: number;
-	condition: WeighInCondition;
+	fasted: number;
+	clothed: number;
 	created_at: string;
 	updated_at: string;
 }
@@ -216,7 +216,8 @@ const toWeighIn = (row: WeighInRow): WeighIn => ({
 	id: row.id,
 	measuredAt: row.measured_at,
 	weightKg: row.weight_kg,
-	condition: row.condition,
+	fasted: row.fasted === 1,
+	clothed: row.clothed === 1,
 	createdAt: row.created_at,
 	updatedAt: row.updated_at
 });
@@ -253,10 +254,10 @@ export async function createWeighIn(db: D1Database, input: WeighInInput): Promis
 	const now = new Date().toISOString();
 	await db
 		.prepare(
-			`INSERT INTO weigh_in (id, measured_at, weight_kg, condition, created_at, updated_at)
-			 VALUES (?, ?, ?, ?, ?, ?)`
+			`INSERT INTO weigh_in (id, measured_at, weight_kg, fasted, clothed, created_at, updated_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?)`
 		)
-		.bind(id, input.measuredAt, input.weightKg, input.condition, now, now)
+		.bind(id, input.measuredAt, input.weightKg, input.fasted ? 1 : 0, input.clothed ? 1 : 0, now, now)
 		.run();
 	return (await getWeighIn(db, id))!;
 }
@@ -270,9 +271,17 @@ export async function updateWeighIn(
 	if (!existing) return null;
 	await db
 		.prepare(
-			`UPDATE weigh_in SET measured_at = ?, weight_kg = ?, condition = ?, updated_at = ? WHERE id = ?`
+			`UPDATE weigh_in SET measured_at = ?, weight_kg = ?, fasted = ?, clothed = ?, updated_at = ?
+			 WHERE id = ?`
 		)
-		.bind(patch.measuredAt, patch.weightKg, patch.condition, new Date().toISOString(), id)
+		.bind(
+			patch.measuredAt,
+			patch.weightKg,
+			patch.fasted ? 1 : 0,
+			patch.clothed ? 1 : 0,
+			new Date().toISOString(),
+			id
+		)
 		.run();
 	return getWeighIn(db, id);
 }

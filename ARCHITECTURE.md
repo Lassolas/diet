@@ -36,8 +36,9 @@ Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
   Max 5 per entry. List/get queries select photo metadata only, never `bytes`.
 - Entry delete cascades to its photo rows in SQL.
 - `weigh_in`: `id` (ULID), `measured_at` (text `YYYY-MM-DDTHH:MM`, Paris
-  wall-clock), `weight_kg` (real), `condition` (`fasted|clothed`), `created_at`,
-  `updated_at`. A separate time series from `meal_entry`; multiple per day.
+  wall-clock), `weight_kg` (real), `fasted` (0/1), `clothed` (0/1),
+  `created_at`, `updated_at`. Two independent condition flags. A separate time
+  series from `meal_entry`; multiple per day.
 
 Migrations are Wrangler D1 migration files in `migrations/`, applied manually.
 Backup relies on D1 Time Travel, plus a manual `wrangler d1 export` before risky

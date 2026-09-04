@@ -37,14 +37,14 @@ _Avoid_: contents, food list, ingredients
 
 **Weigh-in**:
 A single recorded body-weight measurement — when it was taken, the weight in
-kilograms, and its Condition. A separate time series from the Food Diary;
+kilograms, and its two Conditions. A separate time series from the Food Diary;
 multiple per day are allowed.
 _Avoid_: weight entry, measurement, reading
 
 **Condition**:
-The circumstances of a Weigh-in, recorded so the dietician can compare like with
-like: **à jeun** (the standard empty-stomach measurement) or **habillé** (a
-casual one). Chosen as a single toggle, not two independent flags.
+A circumstance of a Weigh-in, recorded so the dietician can compare like with
+like. Two independent yes/no flags, any combination: **fasted** (empty stomach)
+and **clothed** (wearing clothes).
 _Avoid_: state, mode, context
 
 **Frequent Item**:

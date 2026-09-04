@@ -4,7 +4,7 @@
 	import type { PageData } from './$types';
 	import { groupEntriesByDay } from '$lib/domain/reportGrouping';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL, CONDITION_LABEL } from '$lib/ui';
+	import { MEAL_TYPE_LABEL, conditionSummary } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -44,7 +44,7 @@
 			<h2>Poids</h2>
 			<table>
 				<thead>
-					<tr><th>Date</th><th>Heure</th><th>Poids</th><th>Condition</th></tr>
+					<tr><th>Date</th><th>Heure</th><th>Poids</th><th>Conditions</th></tr>
 				</thead>
 				<tbody>
 					{#each weighIns as w (w.id)}
@@ -52,7 +52,7 @@
 							<td>{formatDay(w.measuredAt.slice(0, 10))}</td>
 							<td>{formatTime(w.measuredAt)}</td>
 							<td>{w.weightKg.toFixed(1)} kg</td>
-							<td>{CONDITION_LABEL[w.condition]}</td>
+							<td>{conditionSummary(w)}</td>
 						</tr>
 					{/each}
 				</tbody>

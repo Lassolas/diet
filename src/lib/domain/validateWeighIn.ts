@@ -1,4 +1,4 @@
-import { WEIGH_IN_CONDITIONS, type WeighInInput } from '$lib/types';
+import type { WeighInInput } from '$lib/types';
 
 export const MIN_WEIGHT_KG = 20;
 export const MAX_WEIGHT_KG = 400;
@@ -24,8 +24,8 @@ export function validateWeighIn(input: WeighInInput): string[] {
 		errors.push(`Weight must be between ${MIN_WEIGHT_KG} and ${MAX_WEIGHT_KG} kg.`);
 	}
 
-	if (!WEIGH_IN_CONDITIONS.includes(input.condition)) {
-		errors.push(`Condition must be one of: ${WEIGH_IN_CONDITIONS.join(', ')}.`);
+	if (typeof input.fasted !== 'boolean' || typeof input.clothed !== 'boolean') {
+		errors.push('Fasted and clothed must be true or false.');
 	}
 
 	return errors;

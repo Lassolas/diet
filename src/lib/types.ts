@@ -32,15 +32,15 @@ export interface MealEntryInput {
 	hasPhoto?: boolean;
 }
 
-export const WEIGH_IN_CONDITIONS = ['fasted', 'clothed'] as const;
-export type WeighInCondition = (typeof WEIGH_IN_CONDITIONS)[number];
-
 export interface WeighIn {
 	id: string;
 	/** 'YYYY-MM-DDTHH:MM', Europe/Paris wall-clock (ADR 0002). */
 	measuredAt: string;
 	weightKg: number;
-	condition: WeighInCondition;
+	/** Empty stomach at the time of the weigh-in. */
+	fasted: boolean;
+	/** Wearing clothes at the time of the weigh-in. */
+	clothed: boolean;
 	createdAt: string;
 	updatedAt: string;
 }
@@ -48,5 +48,6 @@ export interface WeighIn {
 export interface WeighInInput {
 	measuredAt: string;
 	weightKg: number;
-	condition: WeighInCondition;
+	fasted: boolean;
+	clothed: boolean;
 }

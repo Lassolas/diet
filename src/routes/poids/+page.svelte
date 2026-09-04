@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { formatTime, formatDay } from '$lib/time';
-	import { CONDITION_LABEL } from '$lib/ui';
+	import { conditionSummary } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -31,9 +31,13 @@
 		{#each data.weighIns as w (w.id)}
 			<li>
 				<a href="/poids/{w.id}">
-					<span class="kg">{w.weightKg.toFixed(1)} kg</span>
-					<span class="when">{formatDay(w.measuredAt.slice(0, 10))} · {formatTime(w.measuredAt)}</span>
-					<span class="cond">{CONDITION_LABEL[w.condition]}</span>
+					<div class="top">
+						<span class="kg">{w.weightKg.toFixed(1)} kg</span>
+						<span class="when"
+							>{formatDay(w.measuredAt.slice(0, 10))} · {formatTime(w.measuredAt)}</span
+						>
+					</div>
+					<span class="cond">{conditionSummary(w)}</span>
 				</a>
 			</li>
 		{/each}
@@ -70,16 +74,18 @@
 		gap: 8px;
 	}
 	li a {
-		display: grid;
-		grid-template-columns: auto 1fr auto;
-		align-items: baseline;
-		gap: 10px;
+		display: block;
 		background: var(--surface);
 		border: 1px solid var(--border);
 		border-radius: 12px;
 		padding: 12px;
 		text-decoration: none;
 		color: var(--text);
+	}
+	.top {
+		display: flex;
+		align-items: baseline;
+		gap: 10px;
 	}
 	.kg {
 		font-weight: 600;
@@ -91,10 +97,9 @@
 		text-transform: capitalize;
 	}
 	.cond {
+		display: inline-block;
+		margin-top: 6px;
 		font-size: 0.8rem;
-		border: 1px solid var(--border);
-		border-radius: 999px;
-		padding: 2px 8px;
 		color: var(--muted);
 	}
 	.fab {

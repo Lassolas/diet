@@ -5,13 +5,16 @@ import type { WeighInInput } from '$lib/types';
 const base: WeighInInput = {
 	measuredAt: '2026-09-04T07:30',
 	weightKg: 72.4,
-	condition: 'fasted'
+	fasted: true,
+	clothed: false
 };
 
 describe('validateWeighIn', () => {
-	it('accepts a well-formed weigh-in', () => {
+	it('accepts a well-formed weigh-in in any condition combination', () => {
 		expect(validateWeighIn(base)).toEqual([]);
-		expect(validateWeighIn({ ...base, condition: 'clothed' })).toEqual([]);
+		expect(validateWeighIn({ ...base, fasted: false, clothed: true })).toEqual([]);
+		expect(validateWeighIn({ ...base, fasted: true, clothed: true })).toEqual([]);
+		expect(validateWeighIn({ ...base, fasted: false, clothed: false })).toEqual([]);
 	});
 
 	it('rejects a malformed time', () => {
@@ -26,11 +29,9 @@ describe('validateWeighIn', () => {
 		expect(validateWeighIn({ ...base, weightKg: MAX_WEIGHT_KG + 1 })).toHaveLength(1);
 	});
 
-	it('rejects an unknown condition', () => {
-		const errors = validateWeighIn({
-			...base,
-			condition: 'naked' as WeighInInput['condition']
-		});
-		expect(errors.some((e) => e.startsWith('Condition must be one of'))).toBe(true);
+	it('rejects non-boolean condition flags', () => {
+		expect(
+			validateWeighIn({ ...base, fasted: 'yes' as unknown as boolean })
+		).toContain('Fasted and clothed must be true or false.');
 	});
 });
