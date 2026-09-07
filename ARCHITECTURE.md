@@ -41,7 +41,7 @@ Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
   series from `meal_entry`; multiple per day.
 - `workout`: `id` (ULID), `started_at` (text `YYYY-MM-DDTHH:MM`, Paris
   wall-clock), `duration_min` (integer, entered in 15-min steps), `workout_type`
-  (`running|bag|hiit|tabata|swimming|sparring|boxing_class|coaching`),
+  (enum — see `WORKOUT_TYPES` in `src/lib/types.ts`; boxing plus cross-training),
   `description` (not null), `feeling` (nullable), `intensity` (integer 1–10),
   `created_at`, `updated_at`. A third time series, parallel to `meal_entry` and
   `weigh_in`; multiple per day. Boxing-training context.

@@ -9,7 +9,7 @@
 		MEAL_TYPE_EMOJI,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
-		WORKOUT_TYPE_EMOJI,
+		WORKOUT_EMOJI,
 		formatDuration
 	} from '$lib/ui';
 
@@ -70,7 +70,7 @@
 							<div class="head">
 								<span class="time">{formatTime(item.at)}</span>
 								<span class="tag"
-									><span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
+									><span class="emo">{WORKOUT_EMOJI}</span>
 									{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span
 								>
 								<span class="body">{item.workout.description}</span>

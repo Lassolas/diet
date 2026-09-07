@@ -32,20 +32,15 @@ export const WORKOUT_TYPE_LABEL: Record<WorkoutType, string> = {
 	swimming: 'Piscine',
 	sparring: 'Sparring',
 	boxing_class: 'Cours de boxe collectif',
-	coaching: 'Séance individuelle (coach)'
+	coaching: 'Séance individuelle (coach)',
+	musculation: 'Musculation'
 };
 
-/** Leading glyph for a workout type — for at-a-glance scanning of the Report. */
-export const WORKOUT_TYPE_EMOJI: Record<WorkoutType, string> = {
-	running: '🏃',
-	bag: '🥊',
-	hiit: '🔥',
-	tabata: '⏱️',
-	swimming: '🏊',
-	sparring: '🤼',
-	boxing_class: '👥',
-	coaching: '🧑‍🏫'
-};
+/**
+ * One glyph for every workout, whatever its type — the Report uses it so a
+ * sport row stands out from meals and weigh-ins at a glance.
+ */
+export const WORKOUT_EMOJI = '🥊';
 
 /** '45 min', '1 h', '1 h 15' from a whole number of minutes. */
 export function formatDuration(min: number): string {

@@ -60,7 +60,8 @@ export const WORKOUT_TYPES = [
 	'swimming',
 	'sparring',
 	'boxing_class',
-	'coaching'
+	'coaching',
+	'musculation'
 ] as const;
 export type WorkoutType = (typeof WORKOUT_TYPES)[number];
 

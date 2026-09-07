@@ -61,13 +61,16 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
 - **Workouts** (`/sport`, French UI label "Sport", `workout` table) are a third
   time series parallel to meal entries and weigh-ins — same shape of code (repo
   fns, `/api/workouts` routes, list/add/edit pages, `WorkoutForm`). Not linked
-  to `meal_entry`. Boxing-training context. `workout_type` is a fixed 8-value
-  enum (`WORKOUT_TYPES` in `types.ts`, French labels + emoji in `ui.ts`);
+  to `meal_entry`. Boxing plus cross-training. `workout_type` is an enum
+  (`WORKOUT_TYPES` in `types.ts`, French labels + emoji in `ui.ts`); adding a
+  value needs a migration that rebuilds the table (SQLite can't alter a CHECK) —
+  see `migrations/0005`;
   `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
-  counterpart). Workouts appear in both the journal and the Report. The Report
-  prefixes every row's type tag with an emoji (`MEAL_TYPE_EMOJI` /
-  `WORKOUT_TYPE_EMOJI` in `ui.ts`, plus ⚖️ for weigh-ins).
+  counterpart). Workouts appear in both the journal and the Report. In the
+  Report every row's type tag is emoji-prefixed: one shared `WORKOUT_EMOJI` (🥊)
+  for all workouts so sport reads at a glance, `MEAL_TYPE_EMOJI` per meal type,
+  ⚖️ for weigh-ins — all in `ui.ts`.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.
