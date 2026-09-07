@@ -37,11 +37,9 @@
 	);
 
 	const includedThemes = $derived(
-		[
-			withMeals && 'repas',
-			withWorkouts && 'sport',
-			withWeighIns && 'poids'
-		].filter((t): t is string => Boolean(t))
+		[withMeals && 'repas', withWorkouts && 'sport', withWeighIns && 'poids'].filter(
+			(t): t is string => Boolean(t)
+		)
 	);
 
 	const itemId = (i: TimelineItem) =>
@@ -50,6 +48,8 @@
 		dateStyle: 'long',
 		timeStyle: 'short'
 	}).format(new Date());
+
+	const kg = (n: number) => `${n.toFixed(1).replace('.', ',')} kg`;
 
 	function apply() {
 		goto(`/report?from=${from}&to=${to}`, { invalidateAll: true });
@@ -64,7 +64,9 @@
 		<label class="cb"><input type="checkbox" bind:checked={withMeals} /> Repas</label>
 		<label class="cb"><input type="checkbox" bind:checked={withWorkouts} /> Sport</label>
 		<label class="cb"><input type="checkbox" bind:checked={withWeighIns} /> Poids</label>
-		<label class="cb"><input type="checkbox" bind:checked={withPhotos} disabled={!withMeals} /> Photos</label>
+		<label class="cb">
+			<input type="checkbox" bind:checked={withPhotos} disabled={!withMeals} /> Photos
+		</label>
 	</span>
 	<button onclick={apply}>Appliquer</button>
 	<button class="primary" onclick={() => window.print()}>Imprimer / PDF</button>
@@ -84,47 +86,41 @@
 				<p class="none">Rien enregistré</p>
 			{:else}
 				{#each day.items as item (item.kind + item.at + itemId(item))}
-					{#if item.kind === 'weighIn'}
-						<div class="line weigh">
-							<span class="time">{formatTime(item.at)}</span>
-							<span class="tag"><span class="emo">⚖️</span> Poids</span>
-							<span class="body"
-								>{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}</span
-							>
-						</div>
-					{:else if item.kind === 'workout'}
-						<div class="line">
-							<div class="head">
-								<span class="time">{formatTime(item.at)}</span>
-								<span class="tag"
-									><span class="emo">{WORKOUT_EMOJI}</span>
-									{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span
+					<div class="line">
+						<span class="time">{formatTime(item.at)}</span>
+						{#if item.kind === 'weighIn'}
+							<span class="emo">⚖️</span>
+							<div class="content">
+								<span class="label">Poids</span><span class="text"
+									>{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</span
 								>
-								<span class="body">{item.workout.description}</span>
 							</div>
-							<p class="note">
-								{formatDuration(item.workout.durationMin)} · intensité {item.workout.intensity}/10{#if item.workout.feeling}
-									· {item.workout.feeling}{/if}
-							</p>
-						</div>
-					{:else}
-						<div class="line">
-							<div class="head">
-								<span class="time">{formatTime(item.at)}</span>
-								<span class="tag"
-									><span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
-									{MEAL_TYPE_LABEL[item.entry.mealType]}</span
+						{:else if item.kind === 'workout'}
+							<span class="emo">{WORKOUT_EMOJI}</span>
+							<div class="content">
+								<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span><span
+									class="text">{item.workout.description}</span
 								>
-								<span class="body">{item.entry.description ?? ''}</span>
+								<p class="note">
+									{formatDuration(item.workout.durationMin)} · intensité {item.workout
+										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
+								</p>
 							</div>
-							{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
-							{#if withPhotos && item.entry.photos.length}
-								<div class="photos">
-									{#each item.entry.photos as photo (photo.id)}<img src={photo.url} alt="" />{/each}
-								</div>
-							{/if}
-						</div>
-					{/if}
+						{:else}
+							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
+							<div class="content">
+								<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>{#if item.entry.description}<span
+										class="text">{item.entry.description}</span
+									>{/if}
+								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
+								{#if withPhotos && item.entry.photos.length}
+									<div class="photos">
+										{#each item.entry.photos as photo (photo.id)}<img src={photo.url} alt="" />{/each}
+									</div>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				{/each}
 			{/if}
 		</section>
@@ -183,58 +179,75 @@
 	.meta {
 		color: var(--muted);
 		font-size: 0.9rem;
-		margin: 4px 0 20px;
+		margin: 4px 0 24px;
 	}
 	.day {
 		break-inside: avoid;
-		margin-bottom: 18px;
+		margin-bottom: 16px;
 	}
 	.day h2 {
-		font-size: 1rem;
+		font-size: 0.9rem;
+		font-weight: 700;
 		text-transform: capitalize;
+		color: var(--text);
+		margin: 0 0 2px;
+		padding-bottom: 3px;
 		border-bottom: 1px solid var(--border);
-		padding-bottom: 4px;
-		margin: 0 0 8px;
 	}
 	.none {
 		color: var(--muted);
 		font-style: italic;
-		margin: 0;
+		margin: 3px 0;
+		font-size: 0.85rem;
 	}
+	/* Days with nothing logged recede — the heading shouldn't shout at a gap. */
+	.day:has(.none) h2 {
+		color: var(--muted);
+		font-weight: 600;
+		border-bottom-color: transparent;
+	}
+
 	.line {
+		display: grid;
+		grid-template-columns: 3rem 1.4rem 1fr;
+		column-gap: 0.5rem;
+		align-items: baseline;
+		padding: 5px 0;
+		border-top: 1px solid var(--border);
 		break-inside: avoid;
-		margin: 8px 0;
 	}
-	.head {
-		display: flex;
-		gap: 8px;
-		align-items: baseline;
-	}
-	.line.weigh {
-		display: flex;
-		gap: 8px;
-		align-items: baseline;
+	.line:first-of-type {
+		border-top: none;
 	}
 	.time {
 		font-variant-numeric: tabular-nums;
 		color: var(--muted);
-	}
-	.tag {
-		font-weight: 600;
 		font-size: 0.85rem;
-		min-width: 4.5rem;
 	}
-	.tag .emo {
+	.emo {
+		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+		font-size: 0.9rem;
+		text-align: center;
+		line-height: 1;
+	}
+	.content {
+		min-width: 0;
+	}
+	.label {
+		font-weight: 700;
+		font-size: 0.9rem;
+	}
+	.text::before {
+		content: '—';
+		margin: 0 0.4em;
+		color: var(--muted);
 		font-weight: 400;
 	}
-	.line.weigh .body {
-		font-weight: 600;
-	}
 	.note {
-		margin: 2px 0 0;
+		margin: 1px 0 0;
 		font-style: italic;
 		color: var(--muted);
-		font-size: 0.9rem;
+		font-size: 0.85rem;
 	}
 	.photos {
 		display: flex;
@@ -243,8 +256,8 @@
 		margin-top: 6px;
 	}
 	.photos img {
-		width: 76px;
-		height: 76px;
+		width: 70px;
+		height: 70px;
 		object-fit: cover;
 		border-radius: 4px;
 	}
@@ -257,6 +270,10 @@
 			border: none;
 			border-radius: 0;
 			padding: 0;
+		}
+		.line,
+		.day h2 {
+			border-color: #bbb;
 		}
 		:global(.app) {
 			max-width: none;

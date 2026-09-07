@@ -2,7 +2,14 @@
 	import type { PageData } from './$types';
 	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL, conditionSummary, WORKOUT_TYPE_LABEL, formatDuration } from '$lib/ui';
+	import {
+		MEAL_TYPE_LABEL,
+		MEAL_TYPE_EMOJI,
+		conditionSummary,
+		WORKOUT_TYPE_LABEL,
+		WORKOUT_EMOJI,
+		formatDuration
+	} from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -13,6 +20,8 @@
 
 	const itemId = (i: TimelineItem) =>
 		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
+
+	const kg = (n: number) => `${n.toFixed(1).replace('.', ',')} kg`;
 </script>
 
 <header>
@@ -34,51 +43,48 @@
 			<h2>{formatDay(day.date)}</h2>
 			<ul>
 				{#each day.items as item (item.kind + item.at + itemId(item))}
-					{#if item.kind === 'weighIn'}
-						<li>
-							<a href="/poids/{item.weighIn.id}" class="weigh">
-								<div class="row">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="type">Poids</span>
-								</div>
-								<p class="desc">
-									{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}
-								</p>
+					<li>
+						{#if item.kind === 'weighIn'}
+							<a href="/poids/{item.weighIn.id}" class="item">
+								<span class="time">{formatTime(item.at)}</span>
+								<span class="emo">⚖️</span>
+								<span class="body">
+									<span class="label">Poids</span>
+									<span class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</span>
+								</span>
 							</a>
-						</li>
-					{:else if item.kind === 'workout'}
-						<li>
-							<a href="/sport/{item.workout.id}" class="workout">
-								<div class="row">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="type">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
-								</div>
-								<p class="desc">{item.workout.description}</p>
-								<p class="note">
-									{formatDuration(item.workout.durationMin)} · intensité {item.workout.intensity}/10{#if item.workout.feeling}
-										· {item.workout.feeling}{/if}
-								</p>
+						{:else if item.kind === 'workout'}
+							<a href="/sport/{item.workout.id}" class="item">
+								<span class="time">{formatTime(item.at)}</span>
+								<span class="emo">{WORKOUT_EMOJI}</span>
+								<span class="body">
+									<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+									<span class="text">{item.workout.description}</span>
+									<span class="sub"
+										>{formatDuration(item.workout.durationMin)} · intensité {item.workout
+											.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}</span
+									>
+								</span>
 							</a>
-						</li>
-					{:else}
-						<li>
-							<a href="/entry/{item.entry.id}">
-								<div class="row">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="type">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
-								</div>
-								{#if item.entry.description}<p class="desc">{item.entry.description}</p>{/if}
-								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
-								{#if item.entry.photos.length}
-									<div class="thumbs">
-										{#each item.entry.photos as photo (photo.id)}
-											<img src={photo.url} alt="" />
-										{/each}
-									</div>
-								{/if}
+						{:else}
+							<a href="/entry/{item.entry.id}" class="item">
+								<span class="time">{formatTime(item.at)}</span>
+								<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
+								<span class="body">
+									<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
+									{#if item.entry.description}<span class="text">{item.entry.description}</span>{/if}
+									{#if item.entry.note}<span class="sub">{item.entry.note}</span>{/if}
+									{#if item.entry.photos.length}
+										<span class="thumbs">
+											{#each item.entry.photos as photo (photo.id)}
+												<img src={photo.url} alt="" />
+											{/each}
+										</span>
+									{/if}
+								</span>
 							</a>
-						</li>
-					{/if}
+						{/if}
+					</li>
 				{/each}
 			</ul>
 		</section>
@@ -135,63 +141,75 @@
 		text-align: center;
 	}
 	h2 {
-		font-size: 0.95rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		letter-spacing: 0.02em;
 		color: var(--muted);
 		text-transform: capitalize;
-		margin: 24px 0 8px;
+		margin: 22px 0 6px;
 	}
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-	li a {
-		display: block;
 		background: var(--surface);
 		border: 1px solid var(--border);
 		border-radius: 12px;
-		padding: 12px;
+		overflow: hidden;
+	}
+	li + li .item {
+		border-top: 1px solid var(--border);
+	}
+
+	.item {
+		display: grid;
+		grid-template-columns: 3rem 1.6rem 1fr;
+		column-gap: 0.5rem;
+		align-items: baseline;
+		padding: 11px 14px;
 		text-decoration: none;
 		color: var(--text);
 	}
-	li a.weigh {
-		border-left: 3px solid var(--accent);
-	}
-	li a.workout {
-		border-left: 3px solid #c9803a;
-	}
-	.row {
-		display: flex;
-		gap: 10px;
-		font-size: 0.85rem;
-		color: var(--muted);
-	}
 	.time {
 		font-variant-numeric: tabular-nums;
-	}
-	.desc {
-		margin: 4px 0 0;
-	}
-	.note {
-		margin: 4px 0 0;
-		font-size: 0.9rem;
+		font-size: 0.8rem;
 		color: var(--muted);
-		font-style: italic;
+	}
+	.emo {
+		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+		font-size: 0.95rem;
+		text-align: center;
+		line-height: 1;
+	}
+	.body {
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.label {
+		font-weight: 600;
+		font-size: 0.95rem;
+	}
+	.text {
+		font-size: 0.95rem;
+	}
+	.sub {
+		font-size: 0.85rem;
+		color: var(--muted);
 	}
 	.thumbs {
 		display: flex;
 		gap: 6px;
-		margin-top: 8px;
+		margin-top: 4px;
 	}
 	.thumbs img {
-		width: 56px;
-		height: 56px;
+		width: 52px;
+		height: 52px;
 		object-fit: cover;
 		border-radius: 6px;
 	}
+
 	.fabs {
 		position: fixed;
 		right: max(16px, calc(50vw - 320px + 16px));
