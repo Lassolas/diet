@@ -68,12 +68,17 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   see `migrations/0005`–`0006`;
   `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
-  counterpart). Workouts appear in both the journal and the Report. In the
-  Report every row's type tag is emoji-prefixed: one shared `WORKOUT_EMOJI` (🥊)
-  for all workouts so sport reads at a glance, `MEAL_TYPE_EMOJI` per meal type,
-  ⚖️ for weigh-ins — all in `ui.ts`. The Report's Repas/Sport/Poids/Photos
-  checkboxes filter the print client-side (excluded series → empty arrays into
-  `buildTimeline`); the h1 drops "alimentaire" when Repas is off.
+  counterpart). Workouts appear in both the journal and the Report.
+- **Row identity** (journal + Report): each row carries an emoji and a
+  category-tinted "header" — `MEAL_TYPE_EMOJI` / `MEAL_TYPE_TINT` per meal type
+  (yellow, warming through the day; snack a desaturated cream), one shared
+  `WORKOUT_EMOJI` (🥊) + `WORKOUT_TINT` (red-ish) for every workout, ⚖️ +
+  `WEIGH_IN_TINT` (blue-ish) for weigh-ins — all in `ui.ts`, applied as an inline
+  `background` (a header band in the journal, a chip on the label in the Report;
+  Report chips carry `print-color-adjust: exact`).
+- **Report filters**: the Repas/Sport/Poids/Photos checkboxes filter the print
+  client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
+  "alimentaire" when Repas is off; days with nothing logged get a dimmed heading.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.

@@ -6,9 +6,12 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
+		MEAL_TYPE_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_EMOJI,
+		WORKOUT_TINT,
+		WEIGH_IN_TINT,
 		formatDuration
 	} from '$lib/ui';
 
@@ -58,42 +61,48 @@
 					<li>
 						{#if item.kind === 'weighIn'}
 							<a href="/poids/{item.weighIn.id}" class="item">
-								<span class="time">{formatTime(item.at)}</span>
-								<span class="emo">⚖️</span>
-								<span class="body">
+								<div class="head" style="background:{WEIGH_IN_TINT}">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="emo">⚖️</span>
 									<span class="label">Poids</span>
-									<span class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</span>
-								</span>
+								</div>
+								<div class="content">
+									<p class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</p>
+								</div>
 							</a>
 						{:else if item.kind === 'workout'}
 							<a href="/sport/{item.workout.id}" class="item">
-								<span class="time">{formatTime(item.at)}</span>
-								<span class="emo">{WORKOUT_EMOJI}</span>
-								<span class="body">
+								<div class="head" style="background:{WORKOUT_TINT}">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="emo">{WORKOUT_EMOJI}</span>
 									<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
-									<span class="text">{item.workout.description}</span>
-									<span class="sub"
-										>{formatDuration(item.workout.durationMin)} · intensité {item.workout
-											.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}</span
-									>
-								</span>
+								</div>
+								<div class="content">
+									<p class="text">{item.workout.description}</p>
+									<p class="sub">
+										{formatDuration(item.workout.durationMin)} · intensité {item.workout
+											.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
+									</p>
+								</div>
 							</a>
 						{:else}
 							<a href="/entry/{item.entry.id}" class="item">
-								<span class="time">{formatTime(item.at)}</span>
-								<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
-								<span class="body">
+								<div class="head" style="background:{MEAL_TYPE_TINT[item.entry.mealType]}">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
 									<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
-									{#if item.entry.description}<span class="text">{item.entry.description}</span>{/if}
-									{#if item.entry.note}<span class="sub">{item.entry.note}</span>{/if}
+								</div>
+								<div class="content">
+									{#if item.entry.description}<p class="text">{item.entry.description}</p>{/if}
+									{#if item.entry.note}<p class="sub">{item.entry.note}</p>{/if}
 									{#if item.entry.photos.length}
-										<span class="thumbs">
+										<div class="thumbs">
 											{#each item.entry.photos as photo (photo.id)}
 												<img src={photo.url} alt="" />
 											{/each}
-										</span>
+										</div>
 									{/if}
-								</span>
+								</div>
 							</a>
 						{/if}
 					</li>
@@ -180,39 +189,44 @@
 	}
 
 	.item {
-		display: grid;
-		grid-template-columns: 3rem 1.6rem 1fr;
-		column-gap: 0.5rem;
-		align-items: baseline;
-		padding: 11px 14px;
+		display: block;
 		text-decoration: none;
 		color: var(--text);
 	}
+	.head {
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+		padding: 7px 14px;
+	}
 	.time {
+		flex-shrink: 0;
 		font-variant-numeric: tabular-nums;
-		font-size: 0.8rem;
+		font-size: 0.78rem;
 		color: var(--muted);
 	}
 	.emo {
+		flex-shrink: 0;
 		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
 		font-size: 0.95rem;
-		text-align: center;
 		line-height: 1;
-	}
-	.body {
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
 	}
 	.label {
 		font-weight: 600;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
+	}
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		padding: 8px 14px 10px;
 	}
 	.text {
+		margin: 0;
 		font-size: 0.95rem;
 	}
 	.sub {
+		margin: 0;
 		font-size: 0.85rem;
 		color: var(--muted);
 	}

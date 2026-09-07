@@ -7,9 +7,12 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
+		MEAL_TYPE_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_EMOJI,
+		WORKOUT_TINT,
+		WEIGH_IN_TINT,
 		formatDuration
 	} from '$lib/ui';
 
@@ -91,16 +94,16 @@
 						{#if item.kind === 'weighIn'}
 							<span class="emo">⚖️</span>
 							<div class="content">
-								<span class="label">Poids</span><span class="text"
+								<span class="label" style="background:{WEIGH_IN_TINT}">Poids</span><span class="text"
 									>{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</span
 								>
 							</div>
 						{:else if item.kind === 'workout'}
 							<span class="emo">{WORKOUT_EMOJI}</span>
 							<div class="content">
-								<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span><span
-									class="text">{item.workout.description}</span
-								>
+								<span class="label" style="background:{WORKOUT_TINT}"
+									>{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span
+								><span class="text">{item.workout.description}</span>
 								<p class="note">
 									{formatDuration(item.workout.durationMin)} · intensité {item.workout
 										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
@@ -109,9 +112,9 @@
 						{:else}
 							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
 							<div class="content">
-								<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>{#if item.entry.description}<span
-										class="text">{item.entry.description}</span
-									>{/if}
+								<span class="label" style="background:{MEAL_TYPE_TINT[item.entry.mealType]}"
+									>{MEAL_TYPE_LABEL[item.entry.mealType]}</span
+								>{#if item.entry.description}<span class="text">{item.entry.description}</span>{/if}
 								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
 								{#if withPhotos && item.entry.photos.length}
 									<div class="photos">
@@ -235,11 +238,16 @@
 	}
 	.label {
 		font-weight: 700;
-		font-size: 0.9rem;
+		font-size: 0.85rem;
+		padding: 1px 6px;
+		border-radius: 4px;
+		white-space: nowrap;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
 	}
 	.text::before {
 		content: '—';
-		margin: 0 0.4em;
+		margin: 0 0.45em;
 		color: var(--muted);
 		font-weight: 400;
 	}

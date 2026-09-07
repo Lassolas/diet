@@ -8,13 +8,27 @@ export const MEAL_TYPE_LABEL: Record<MealType, string> = {
 	snack: 'Collation'
 };
 
-/** Leading glyph for a meal type — for at-a-glance scanning of the Report. */
+/** Leading glyph for a meal type — for at-a-glance scanning. */
 export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
 	breakfast: '🥐',
 	lunch: '🍽️',
 	dinner: '🍲',
-	snack: '🍎'
+	snack: '🍌'
 };
+
+/**
+ * Background tint for an entry's coloured header, by category. Food is yellow
+ * and warms through the day; a snack is a desaturated cream; sport is red-ish;
+ * a weigh-in is blue-ish. All light enough for the default dark text.
+ */
+export const MEAL_TYPE_TINT: Record<MealType, string> = {
+	breakfast: '#fdf4cf',
+	lunch: '#fbe9ac',
+	dinner: '#f6dd93',
+	snack: '#eee7d2'
+};
+export const WORKOUT_TINT = '#f8d9d0';
+export const WEIGH_IN_TINT = '#dbe7f4';
 
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {
