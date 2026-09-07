@@ -33,7 +33,15 @@ export const WORKOUT_TYPE_LABEL: Record<WorkoutType, string> = {
 	sparring: 'Sparring',
 	boxing_class: 'Cours de boxe collectif',
 	coaching: 'Séance individuelle (coach)',
-	musculation: 'Musculation'
+	musculation: 'Musculation',
+	paos: "Pattes d'ours",
+	rope: 'Corde à sauter',
+	prepa: 'Prépa physique',
+	cycling: 'Vélo / home-trainer',
+	rowing: 'Rameur',
+	circuit: 'Circuit training',
+	mobility: 'Mobilité / étirements',
+	yoga: 'Yoga / Pilates'
 };
 
 /**

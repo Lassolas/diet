@@ -21,8 +21,27 @@
 	let to = $state(range.to);
 	let withPhotos = $state(true);
 
+	// Which themes go into the report. All on by default; toggled client-side,
+	// no re-fetch. `withPhotos` only bites when meals are included.
+	let withMeals = $state(true);
+	let withWorkouts = $state(true);
+	let withWeighIns = $state(true);
+
 	const days = $derived(
-		buildTimeline(data.entries, data.weighIns, data.workouts, { from: data.from, to: data.to })
+		buildTimeline(
+			withMeals ? data.entries : [],
+			withWeighIns ? data.weighIns : [],
+			withWorkouts ? data.workouts : [],
+			{ from: data.from, to: data.to }
+		)
+	);
+
+	const includedThemes = $derived(
+		[
+			withMeals && 'repas',
+			withWorkouts && 'sport',
+			withWeighIns && 'poids'
+		].filter((t): t is string => Boolean(t))
 	);
 
 	const itemId = (i: TimelineItem) =>
@@ -41,14 +60,22 @@
 	<a class="btn" href="/">← Journal</a>
 	<label>Du <input type="date" bind:value={from} max={to} /></label>
 	<label>Au <input type="date" bind:value={to} min={from} /></label>
-	<label class="cb"><input type="checkbox" bind:checked={withPhotos} /> Photos</label>
+	<span class="group">
+		<label class="cb"><input type="checkbox" bind:checked={withMeals} /> Repas</label>
+		<label class="cb"><input type="checkbox" bind:checked={withWorkouts} /> Sport</label>
+		<label class="cb"><input type="checkbox" bind:checked={withWeighIns} /> Poids</label>
+		<label class="cb"><input type="checkbox" bind:checked={withPhotos} disabled={!withMeals} /> Photos</label>
+	</span>
 	<button onclick={apply}>Appliquer</button>
 	<button class="primary" onclick={() => window.print()}>Imprimer / PDF</button>
 </div>
 
 <article class="report" class:hide-photos={!withPhotos}>
-	<h1>Journal alimentaire</h1>
-	<p class="meta">Du {formatDay(data.from)} au {formatDay(data.to)} · généré le {generatedAt}</p>
+	<h1>{withMeals ? 'Journal alimentaire' : 'Journal'}</h1>
+	<p class="meta">
+		Du {formatDay(data.from)} au {formatDay(data.to)} · généré le {generatedAt}{#if includedThemes.length < 3}
+			· {includedThemes.join(', ') || 'aucun thème sélectionné'}{/if}
+	</p>
 
 	{#each days as day (day.date)}
 		<section class="day">
@@ -120,6 +147,15 @@
 	.controls input[type='date'] {
 		width: auto;
 	}
+	.controls .group {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px 12px;
+		padding: 4px 10px;
+		border: 1px solid var(--border);
+		border-radius: 10px;
+	}
 	.controls .cb {
 		display: inline-flex;
 		align-items: center;
@@ -127,6 +163,9 @@
 	}
 	.controls .cb input {
 		width: auto;
+	}
+	.controls .cb input:disabled {
+		opacity: 0.4;
 	}
 	.controls .btn {
 		text-decoration: none;

@@ -38,7 +38,7 @@ describe('validateWorkout', () => {
 
 	it('rejects an unknown workout type', () => {
 		expect(
-			validateWorkout({ ...base, workoutType: 'yoga' as unknown as WorkoutInput['workoutType'] })
+			validateWorkout({ ...base, workoutType: 'crossfit' as unknown as WorkoutInput['workoutType'] })
 		).toHaveLength(1);
 	});
 

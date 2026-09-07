@@ -68,7 +68,9 @@ REST-ish, all under `/api` and gated by Cloudflare Access:
 
 The Report is not a server feature: the frontend calls `GET /api/entries`,
 `GET /api/weigh-ins` and `GET /api/workouts` for a date range and renders a
-print layout.
+print layout. Checkboxes (Repas / Sport / Poids / Photos) filter what is
+rendered client-side — no re-fetch; excluded series are passed to
+`buildTimeline` as empty arrays.
 
 ## Client logic worth testing (Vitest, test-first)
 

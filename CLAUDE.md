@@ -64,13 +64,15 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   to `meal_entry`. Boxing plus cross-training. `workout_type` is an enum
   (`WORKOUT_TYPES` in `types.ts`, French labels + emoji in `ui.ts`); adding a
   value needs a migration that rebuilds the table (SQLite can't alter a CHECK) —
-  see `migrations/0005`;
+  see `migrations/0005`–`0006`;
   `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
   counterpart). Workouts appear in both the journal and the Report. In the
   Report every row's type tag is emoji-prefixed: one shared `WORKOUT_EMOJI` (🥊)
   for all workouts so sport reads at a glance, `MEAL_TYPE_EMOJI` per meal type,
-  ⚖️ for weigh-ins — all in `ui.ts`.
+  ⚖️ for weigh-ins — all in `ui.ts`. The Report's Repas/Sport/Poids/Photos
+  checkboxes filter the print client-side (excluded series → empty arrays into
+  `buildTimeline`); the h1 drops "alimentaire" when Repas is off.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.
