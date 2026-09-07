@@ -5,13 +5,11 @@
 	import { formatTime, formatDay } from '$lib/time';
 	import {
 		MEAL_TYPE_LABEL,
-		MEAL_TYPE_EMOJI,
-		MEAL_TINT,
+		MEAL_ACCENT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
-		WORKOUT_TYPE_EMOJI,
-		WORKOUT_TINT,
-		WEIGH_IN_TINT,
+		WORKOUT_ACCENT,
+		WEIGH_IN_ACCENT,
 		formatDuration
 	} from '$lib/ui';
 
@@ -60,53 +58,48 @@
 				{#each day.items as item (item.kind + item.at + itemId(item))}
 					<li>
 						{#if item.kind === 'weighIn'}
-							<a href="/poids/{item.weighIn.id}" class="item">
-								<span class="tile" style="background:{WEIGH_IN_TINT}">⚖️</span>
-								<div class="body">
-									<div class="head">
-										<span class="label">Poids</span>
-										<span class="time">{formatTime(item.at)}</span>
-									</div>
-									<p class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</p>
+							<a
+								href="/poids/{item.weighIn.id}"
+								class="item"
+								style="border-left-color:{WEIGH_IN_ACCENT}"
+							>
+								<div class="head">
+									<span class="label">Poids</span>
+									<span class="time">{formatTime(item.at)}</span>
 								</div>
+								<p class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</p>
 							</a>
 						{:else if item.kind === 'workout'}
-							<a href="/sport/{item.workout.id}" class="item">
-								<span class="tile" style="background:{WORKOUT_TINT}"
-									>{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span
-								>
-								<div class="body">
-									<div class="head">
-										<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
-										<span class="time">{formatTime(item.at)}</span>
-									</div>
-									<p class="text">{item.workout.description}</p>
-									<p class="sub">
-										{formatDuration(item.workout.durationMin)} · intensité {item.workout
-											.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
-									</p>
+							<a
+								href="/sport/{item.workout.id}"
+								class="item"
+								style="border-left-color:{WORKOUT_ACCENT}"
+							>
+								<div class="head">
+									<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+									<span class="time">{formatTime(item.at)}</span>
 								</div>
+								<p class="text">{item.workout.description}</p>
+								<p class="sub">
+									{formatDuration(item.workout.durationMin)} · intensité {item.workout
+										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
+								</p>
 							</a>
 						{:else}
-							<a href="/entry/{item.entry.id}" class="item">
-								<span class="tile" style="background:{MEAL_TINT}"
-									>{MEAL_TYPE_EMOJI[item.entry.mealType]}</span
-								>
-								<div class="body">
-									<div class="head">
-										<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
-										<span class="time">{formatTime(item.at)}</span>
-									</div>
-									{#if item.entry.description}<p class="text">{item.entry.description}</p>{/if}
-									{#if item.entry.note}<p class="sub">{item.entry.note}</p>{/if}
-									{#if item.entry.photos.length}
-										<div class="thumbs">
-											{#each item.entry.photos as photo (photo.id)}
-												<img src={photo.url} alt="" />
-											{/each}
-										</div>
-									{/if}
+							<a href="/entry/{item.entry.id}" class="item" style="border-left-color:{MEAL_ACCENT}">
+								<div class="head">
+									<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
+									<span class="time">{formatTime(item.at)}</span>
 								</div>
+								{#if item.entry.description}<p class="text">{item.entry.description}</p>{/if}
+								{#if item.entry.note}<p class="sub">{item.entry.note}</p>{/if}
+								{#if item.entry.photos.length}
+									<div class="thumbs">
+										{#each item.entry.photos as photo (photo.id)}
+											<img src={photo.url} alt="" />
+										{/each}
+									</div>
+								{/if}
 							</a>
 						{/if}
 					</li>
@@ -216,37 +209,21 @@
 		padding: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 10px;
+		gap: 9px;
 	}
 
 	.item {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 12px;
+		display: block;
 		background: var(--surface);
 		border: 1px solid var(--border);
-		border-radius: 14px;
-		padding: 12px 14px;
+		border-left-width: 3px;
+		border-radius: 12px;
+		padding: 11px 14px;
 		text-decoration: none;
 		color: var(--text);
 		box-shadow:
 			0 1px 2px rgba(0, 0, 0, 0.03),
-			0 2px 10px rgba(0, 0, 0, 0.03);
-	}
-	.tile {
-		width: 34px;
-		height: 34px;
-		border-radius: 10px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 1.05rem;
-		line-height: 1;
-		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-		align-self: start;
-	}
-	.body {
-		min-width: 0;
+			0 2px 8px rgba(0, 0, 0, 0.03);
 	}
 	.head {
 		display: flex;

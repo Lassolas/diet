@@ -17,13 +17,13 @@ export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
 };
 
 /**
- * Muted tile colour behind an entry's emoji — one soft hue per category
- * (warm wheat for food, soft clay for sport, cool slate for a weigh-in).
- * Kept low-saturation so it accents rather than washes the row.
+ * Saturated accent per category — a thin coloured strip down the left edge of
+ * a journal card / report line. Gold for food, red for sport, blue for a
+ * weigh-in.
  */
-export const MEAL_TINT = '#F3E7C0';
-export const WORKOUT_TINT = '#F3D9D0';
-export const WEIGH_IN_TINT = '#D7E3EC';
+export const MEAL_ACCENT = '#D49A2C';
+export const WORKOUT_ACCENT = '#C6423B';
+export const WEIGH_IN_ACCENT = '#3C6FB0';
 
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {

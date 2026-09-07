@@ -69,16 +69,15 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
   counterpart). Workouts appear in both the journal and the Report.
-- **Row identity** (journal + Report): each row carries a type emoji
-  (`MEAL_TYPE_EMOJI`, `WORKOUT_TYPE_EMOJI`, ⚖️) on a muted category tile colour —
-  `MEAL_TINT` (wheat), `WORKOUT_TINT` (clay), `WEIGH_IN_TINT` (slate), all in
-  `ui.ts`, applied as an inline `background`. Journal: the tile is a 34px rounded
-  square holding the emoji, on an airy card. Report: the tint is a chip on the
-  label (carries `print-color-adjust: exact`). The colour is confined to that
-  small element — no full-row wash.
+- **Row identity**: a saturated category accent as a 3px left strip —
+  `MEAL_ACCENT` (gold), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue) in
+  `ui.ts`, set via inline `border-left-color`. Journal cards have no emoji; the
+  Report keeps a per-type emoji column (`MEAL_TYPE_EMOJI` / `WORKOUT_TYPE_EMOJI`
+  / ⚖️) and its `.line` strip carries `print-color-adjust: exact`.
 - **Journal layout**: sticky frosted header keeps the Sport/Poids/Rapport nav
   reachable from any scroll position; centred pill date separators; separated
-  cards (`gap`, hairline border, soft shadow); a `.tail` spacer clears the FABs.
+  cards (`gap`, hairline border, left accent strip, soft shadow); a `.tail`
+  spacer clears the FABs.
 - **Report filters**: the Repas/Sport/Poids/Photos checkboxes filter the print
   client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
   "alimentaire" when Repas is off; days with nothing logged get a dimmed heading.

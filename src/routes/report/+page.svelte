@@ -7,12 +7,12 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
-		MEAL_TINT,
+		MEAL_ACCENT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_TYPE_EMOJI,
-		WORKOUT_TINT,
-		WEIGH_IN_TINT,
+		WORKOUT_ACCENT,
+		WEIGH_IN_ACCENT,
 		formatDuration
 	} from '$lib/ui';
 
@@ -47,6 +47,8 @@
 
 	const itemId = (i: TimelineItem) =>
 		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
+	const lineAccent = (i: TimelineItem) =>
+		i.kind === 'weighIn' ? WEIGH_IN_ACCENT : i.kind === 'workout' ? WORKOUT_ACCENT : MEAL_ACCENT;
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'
@@ -89,21 +91,21 @@
 				<p class="none">Rien enregistré</p>
 			{:else}
 				{#each day.items as item (item.kind + item.at + itemId(item))}
-					<div class="line">
+					<div class="line" style="border-left-color:{lineAccent(item)}">
 						<span class="time">{formatTime(item.at)}</span>
 						{#if item.kind === 'weighIn'}
 							<span class="emo">⚖️</span>
 							<div class="content">
-								<span class="label" style="background:{WEIGH_IN_TINT}">Poids</span><span class="text"
+								<span class="label">Poids</span><span class="text"
 									>{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</span
 								>
 							</div>
 						{:else if item.kind === 'workout'}
 							<span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
 							<div class="content">
-								<span class="label" style="background:{WORKOUT_TINT}"
-									>{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span
-								><span class="text">{item.workout.description}</span>
+								<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span><span
+									class="text">{item.workout.description}</span
+								>
 								<p class="note">
 									{formatDuration(item.workout.durationMin)} · intensité {item.workout
 										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
@@ -112,9 +114,9 @@
 						{:else}
 							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
 							<div class="content">
-								<span class="label" style="background:{MEAL_TINT}"
-									>{MEAL_TYPE_LABEL[item.entry.mealType]}</span
-								>{#if item.entry.description}<span class="text">{item.entry.description}</span>{/if}
+								<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>{#if item.entry.description}<span
+										class="text">{item.entry.description}</span
+									>{/if}
 								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
 								{#if withPhotos && item.entry.photos.length}
 									<div class="photos">
@@ -215,9 +217,12 @@
 		grid-template-columns: 3rem 1.4rem 1fr;
 		column-gap: 0.5rem;
 		align-items: baseline;
-		padding: 5px 0;
+		padding: 5px 0 5px 8px;
 		border-top: 1px solid var(--border);
+		border-left: 3px solid;
 		break-inside: avoid;
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
 	}
 	.line:first-of-type {
 		border-top: none;
@@ -239,11 +244,6 @@
 	.label {
 		font-weight: 700;
 		font-size: 0.85rem;
-		padding: 1px 6px;
-		border-radius: 4px;
-		white-space: nowrap;
-		-webkit-print-color-adjust: exact;
-		print-color-adjust: exact;
 	}
 	.text::before {
 		content: '—';
@@ -279,7 +279,9 @@
 			border-radius: 0;
 			padding: 0;
 		}
-		.line,
+		.line {
+			border-top-color: #bbb;
+		}
 		.day h2 {
 			border-color: #bbb;
 		}
