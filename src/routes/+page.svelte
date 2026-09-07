@@ -5,7 +5,7 @@
 	import { formatTime, formatDay } from '$lib/time';
 	import {
 		MEAL_TYPE_LABEL,
-		MEAL_ACCENT,
+		mealAccent,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_ACCENT,
@@ -86,7 +86,11 @@
 								</p>
 							</a>
 						{:else}
-							<a href="/entry/{item.entry.id}" class="item" style="border-left-color:{MEAL_ACCENT}">
+							<a
+							href="/entry/{item.entry.id}"
+							class="item"
+							style="border-left-color:{mealAccent(item.entry.mealType)}"
+						>
 								<div class="head">
 									<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
 									<span class="time">{formatTime(item.at)}</span>

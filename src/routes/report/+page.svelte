@@ -7,7 +7,7 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
-		MEAL_ACCENT,
+		mealAccent,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_TYPE_EMOJI,
@@ -48,7 +48,11 @@
 	const itemId = (i: TimelineItem) =>
 		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
 	const lineAccent = (i: TimelineItem) =>
-		i.kind === 'weighIn' ? WEIGH_IN_ACCENT : i.kind === 'workout' ? WORKOUT_ACCENT : MEAL_ACCENT;
+		i.kind === 'weighIn'
+			? WEIGH_IN_ACCENT
+			: i.kind === 'workout'
+				? WORKOUT_ACCENT
+				: mealAccent(i.entry.mealType);
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'

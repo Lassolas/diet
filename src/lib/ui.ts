@@ -22,8 +22,15 @@ export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
  * weigh-in.
  */
 export const MEAL_ACCENT = '#D49A2C';
+/** A snack is a minor meal — a softer, less-saturated gold. */
+export const SNACK_ACCENT = '#C4A362';
 export const WORKOUT_ACCENT = '#C6423B';
 export const WEIGH_IN_ACCENT = '#3C6FB0';
+
+/** Left-strip accent for a meal, snacks set apart from the three main meals. */
+export function mealAccent(type: MealType): string {
+	return type === 'snack' ? SNACK_ACCENT : MEAL_ACCENT;
+}
 
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {
