@@ -71,11 +71,12 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   counterpart). Workouts appear in both the journal and the Report.
 - **Row identity** (journal + Report): each row carries an emoji and a
   category-tinted "header" — `MEAL_TYPE_EMOJI` / `MEAL_TYPE_TINT` per meal type
-  (yellow, warming through the day; snack a desaturated cream), one shared
-  `WORKOUT_EMOJI` (🥊) + `WORKOUT_TINT` (red-ish) for every workout, ⚖️ +
-  `WEIGH_IN_TINT` (blue-ish) for weigh-ins — all in `ui.ts`, applied as an inline
-  `background` (a header band in the journal, a chip on the label in the Report;
-  Report chips carry `print-color-adjust: exact`).
+  (yellow, warming through the day; snack a desaturated cream),
+  `WORKOUT_TYPE_EMOJI` per workout type + one `WORKOUT_TINT` (red-ish) for all
+  workouts, ⚖️ + `WEIGH_IN_TINT` (blue-ish) for weigh-ins — all in `ui.ts`,
+  applied as an inline `background` (a header band in the journal, a chip on the
+  label in the Report; Report chips carry `print-color-adjust: exact`). The tint,
+  not the emoji, is what makes sport scannable, so the emoji stays type-specific.
 - **Report filters**: the Repas/Sport/Poids/Photos checkboxes filter the print
   client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
   "alimentaire" when Repas is off; days with nothing logged get a dimmed heading.

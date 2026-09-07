@@ -9,7 +9,7 @@
 		MEAL_TYPE_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
-		WORKOUT_EMOJI,
+		WORKOUT_TYPE_EMOJI,
 		WORKOUT_TINT,
 		WEIGH_IN_TINT,
 		formatDuration
@@ -74,7 +74,7 @@
 							<a href="/sport/{item.workout.id}" class="item">
 								<div class="head" style="background:{WORKOUT_TINT}">
 									<span class="time">{formatTime(item.at)}</span>
-									<span class="emo">{WORKOUT_EMOJI}</span>
+									<span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
 									<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
 								</div>
 								<div class="content">

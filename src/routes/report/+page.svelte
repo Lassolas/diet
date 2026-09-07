@@ -10,7 +10,7 @@
 		MEAL_TYPE_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
-		WORKOUT_EMOJI,
+		WORKOUT_TYPE_EMOJI,
 		WORKOUT_TINT,
 		WEIGH_IN_TINT,
 		formatDuration
@@ -99,7 +99,7 @@
 								>
 							</div>
 						{:else if item.kind === 'workout'}
-							<span class="emo">{WORKOUT_EMOJI}</span>
+							<span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
 							<div class="content">
 								<span class="label" style="background:{WORKOUT_TINT}"
 									>{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span

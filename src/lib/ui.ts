@@ -59,10 +59,28 @@ export const WORKOUT_TYPE_LABEL: Record<WorkoutType, string> = {
 };
 
 /**
- * One glyph for every workout, whatever its type — the Report uses it so a
- * sport row stands out from meals and weigh-ins at a glance.
+ * Leading glyph per workout type. The category is already carried by the tint
+ * (WORKOUT_TINT) and the "Sport" section, so this can be specific.
  */
-export const WORKOUT_EMOJI = '🥊';
+export const WORKOUT_TYPE_EMOJI: Record<WorkoutType, string> = {
+	running: '🏃',
+	bag: '🥊',
+	hiit: '🔥',
+	tabata: '⏱️',
+	swimming: '🏊',
+	sparring: '🤼',
+	boxing_class: '👥',
+	coaching: '🧑‍🏫',
+	musculation: '🏋️',
+	paos: '🎯',
+	rope: '🪢',
+	prepa: '💪',
+	cycling: '🚴',
+	rowing: '🚣',
+	circuit: '🔁',
+	mobility: '🤸',
+	yoga: '🧘'
+};
 
 /** '45 min', '1 h', '1 h 15' from a whole number of minutes. */
 export function formatDuration(min: number): string {
