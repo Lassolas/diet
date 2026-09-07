@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
@@ -13,15 +14,26 @@
 
 	let { data }: { data: PageData } = $props();
 
-	// Newest day first, and within a day, newest first.
+	// Chronological, like a chat log: oldest at the top, today at the bottom.
+	// Scroll up to go back in time.
 	const days = $derived(
-		buildTimeline(data.entries, data.weighIns, data.workouts, { order: 'desc' })
+		buildTimeline(data.entries, data.weighIns, data.workouts, { order: 'asc' })
 	);
 
 	const itemId = (i: TimelineItem) =>
 		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
 
 	const kg = (n: number) => `${n.toFixed(1).replace('.', ',')} kg`;
+
+	// Land on the latest entry. Runs on every mount (including coming back from
+	// an entry page), which matches the "return to now" mental model. Repeated
+	// to catch layout that settles late (photos loading).
+	onMount(() => {
+		const toBottom = () => window.scrollTo(0, document.documentElement.scrollHeight);
+		toBottom();
+		requestAnimationFrame(toBottom);
+		setTimeout(toBottom, 150);
+	});
 </script>
 
 <header>
@@ -89,6 +101,7 @@
 			</ul>
 		</section>
 	{/each}
+	<div class="tail" aria-hidden="true"></div>
 {/if}
 
 <div class="fabs">
@@ -139,6 +152,11 @@
 		color: var(--muted);
 		margin-top: 40px;
 		text-align: center;
+	}
+	/* Clearance so the newest rows sit above the floating action buttons when
+	   the page lands scrolled to the bottom. */
+	.tail {
+		height: 180px;
 	}
 	h2 {
 		font-size: 0.8rem;

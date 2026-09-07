@@ -84,8 +84,9 @@ rendered client-side — no re-fetch; excluded series are passed to
 - `interpretTranscript(text, confidence)` — dictation usable vs re-ask
 - `buildTimeline(entries, weighIns, workouts, options)` — merges meals,
   weigh-ins and workouts into one time-sorted stream per day. The Report calls
-  it with `{ from, to }` (ascending, empty days included); the journal calls it
-  with `{ order: 'desc' }` (newest day and newest item first, no empty days).
+  it with `{ from, to }` (empty days included); the journal calls it with
+  `{ order: 'asc' }` (no empty days). Both are ascending — oldest first, latest
+  at the bottom; the journal lands scrolled to the bottom, chat-log style.
   When items share a minute: weigh-in, then workout, then meal.
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality

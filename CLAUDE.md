@@ -42,8 +42,9 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   `WeighInForm` / `WorkoutForm`) and the server routes import the same
   functions. Change behaviour here test-first.
   `buildTimeline(entries, weighIns, workouts, opts)` merges all three series by
-  day for both the journal (`+page.svelte`, newest-first, no empty days) and the
-  Report (ascending, empty days shown) — one function, different options.
+  day for both the journal (`+page.svelte`, `order:'asc'`, no empty days — the
+  page lands scrolled to the bottom, chat-log style) and the Report (empty days
+  shown) — one function, different options. Both ascending (oldest first).
   Shared-minute order: weigh-in, workout, meal.
 - **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR), no
   server-side transcription. `VoiceInput` is the inline dictate button reused by
