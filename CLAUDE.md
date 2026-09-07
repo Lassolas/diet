@@ -70,11 +70,11 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
   counterpart). Workouts appear in both the journal and the Report.
 - **Row identity**: a saturated category accent as a 3px left strip —
-  `MEAL_ACCENT` (gold; `SNACK_ACCENT`, a softer gold, for snacks — via
-  `mealAccent(type)`), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue) in
-  `ui.ts`, set via inline `border-left-color`. Journal cards have no emoji; the
-  Report keeps a per-type emoji column (`MEAL_TYPE_EMOJI` / `WORKOUT_TYPE_EMOJI`
-  / ⚖️) and its `.line` strip carries `print-color-adjust: exact`.
+  `MEAL_ACCENT` (gold), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue) in
+  `ui.ts`, set via inline `border-left-color`. Journal cards carry no emoji
+  except a 🍌 prefix on the "Collation" label; the Report keeps a per-type emoji
+  column (`MEAL_TYPE_EMOJI` / `WORKOUT_TYPE_EMOJI` / ⚖️) and its `.line` strip
+  carries `print-color-adjust: exact`.
 - **Journal layout**: sticky frosted header keeps the Sport/Poids/Rapport nav
   reachable from any scroll position; centred pill date separators; separated
   cards (`gap`, hairline border, left accent strip, soft shadow); a `.tail`
