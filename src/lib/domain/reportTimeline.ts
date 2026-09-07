@@ -1,8 +1,9 @@
-import type { MealEntry, WeighIn } from '$lib/types';
+import type { MealEntry, WeighIn, Workout } from '$lib/types';
 
 export type TimelineItem =
 	| { kind: 'meal'; at: string; entry: MealEntry }
-	| { kind: 'weighIn'; at: string; weighIn: WeighIn };
+	| { kind: 'weighIn'; at: string; weighIn: WeighIn }
+	| { kind: 'workout'; at: string; workout: Workout };
 
 export interface TimelineDay {
 	/** 'YYYY-MM-DD'. */
@@ -26,16 +27,17 @@ function nextDay(date: string): string {
 }
 
 /**
- * Merges Meal Entries and Weigh-ins into one chronological stream per calendar
- * day. When `from`/`to` are given, every day in the range is emitted (empty ones
- * included) — used by the Report. Without them, only days that have something
- * are emitted — used by the journal. `order: 'desc'` flips days and the items
- * within each day to newest-first. When a meal and a weigh-in share a minute,
- * the weigh-in sorts first.
+ * Merges Meal Entries, Weigh-ins and Workouts into one chronological stream per
+ * calendar day. When `from`/`to` are given, every day in the range is emitted
+ * (empty ones included) — used by the Report. Without them, only days that have
+ * something are emitted — used by the journal. `order: 'desc'` flips days and the
+ * items within each day to newest-first. When several items share a minute, a
+ * weigh-in sorts first, then a workout, then a meal.
  */
 export function buildTimeline(
 	entries: MealEntry[],
 	weighIns: WeighIn[],
+	workouts: Workout[],
 	options: TimelineOptions = {}
 ): TimelineDay[] {
 	const { from, to, order = 'asc' } = options;
@@ -56,11 +58,14 @@ export function buildTimeline(
 	for (const weighIn of weighIns) {
 		push(weighIn.measuredAt.slice(0, 10), { kind: 'weighIn', at: weighIn.measuredAt, weighIn });
 	}
+	for (const workout of workouts) {
+		push(workout.startedAt.slice(0, 10), { kind: 'workout', at: workout.startedAt, workout });
+	}
 	for (const entry of entries) {
 		push(entry.eatenAt.slice(0, 10), { kind: 'meal', at: entry.eatenAt, entry });
 	}
 
-	const rank = (i: TimelineItem) => (i.kind === 'weighIn' ? 0 : 1);
+	const rank = (i: TimelineItem) => (i.kind === 'weighIn' ? 0 : i.kind === 'workout' ? 1 : 2);
 	const sortItems = (items: TimelineItem[]) =>
 		items.sort((a, b) => {
 			const cmp = a.at.localeCompare(b.at) || rank(a) - rank(b);

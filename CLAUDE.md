@@ -37,22 +37,34 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   column in a list query — `repo.ts` selects photo metadata only and fetches
   bytes one row at a time via `getPhotoBytes`.
 - **Domain logic is pure and tested**: `mealType`, `frequentItems`,
-  `validateEntry`, `validateWeighIn`, `interpretTranscript`, `reportTimeline`
-  under `src/lib/domain/`. Both the client (`EntryForm` / `WeighInForm`) and the
-  server routes import the same functions. Change behaviour here test-first.
-  `buildTimeline` merges meals and weigh-ins by day for both the journal
-  (`+page.svelte`, newest-first, no empty days) and the Report (ascending,
-  empty days shown) — one function, different options.
+  `validateEntry`, `validateWeighIn`, `validateWorkout`, `interpretTranscript`,
+  `reportTimeline` under `src/lib/domain/`. Both the client (`EntryForm` /
+  `WeighInForm` / `WorkoutForm`) and the server routes import the same
+  functions. Change behaviour here test-first.
+  `buildTimeline(entries, weighIns, workouts, opts)` merges all three series by
+  day for both the journal (`+page.svelte`, newest-first, no empty days) and the
+  Report (ascending, empty days shown) — one function, different options.
+  Shared-minute order: weigh-in, workout, meal.
 - **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR). The
   `/dicter` route auto-starts dictation and creates an entry from the transcript
   + time-of-day meal type. No server-side transcription. The home 🍽️/🍌 FABs
-  point here; `?type=collation` forces the Snack meal type.
+  point here; `?type=collation` forces the Snack meal type. `VoiceInput`
+  (inline dictate button, reused by `EntryForm` and `WorkoutForm`) takes an
+  `autostart` prop; the home 🥊 FAB opens `/seances/add?voice=1` which uses it.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the
   `WeightWheel` component (CSS scroll-snap 0.1 kg picker); a new weigh-in
   defaults to the last recorded weight (loaded in `poids/add/+page.ts`).
   Conditions are two independent booleans (`fasted`, `clothed`).
+- **Workouts** (`/seances`, `workout` table) are a third time series parallel to
+  meal entries and weigh-ins — same shape of code (repo fns, `/api/workouts`
+  routes, list/add/edit pages, `WorkoutForm`). Not linked to `meal_entry`.
+  Boxing-training context. `workout_type` is a fixed 8-value enum
+  (`WORKOUT_TYPES` in `types.ts`, French labels in `ui.ts`); `duration_min` is
+  entered via a ±15-min stepper defaulting to 45; `intensity` is a 1–10 slider;
+  `feeling` is an optional free-text remark (the Note counterpart). Workouts
+  appear in both the journal and the Report.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.

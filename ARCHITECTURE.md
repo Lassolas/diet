@@ -39,6 +39,12 @@ Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
   wall-clock), `weight_kg` (real), `fasted` (0/1), `clothed` (0/1),
   `created_at`, `updated_at`. Two independent condition flags. A separate time
   series from `meal_entry`; multiple per day.
+- `workout`: `id` (ULID), `started_at` (text `YYYY-MM-DDTHH:MM`, Paris
+  wall-clock), `duration_min` (integer, entered in 15-min steps), `workout_type`
+  (`running|bag|hiit|tabata|swimming|sparring|boxing_class|coaching`),
+  `description` (not null), `feeling` (nullable), `intensity` (integer 1–10),
+  `created_at`, `updated_at`. A third time series, parallel to `meal_entry` and
+  `weigh_in`; multiple per day. Boxing-training context.
 
 Migrations are Wrangler D1 migration files in `migrations/`, applied manually.
 Backup relies on D1 Time Travel, plus a manual `wrangler d1 export` before risky
@@ -57,9 +63,12 @@ REST-ish, all under `/api` and gated by Cloudflare Access:
 - `GET /photos/:id` — reads the blob from D1, long cache header
 - `GET /api/weigh-ins?from=&to=` · `POST /api/weigh-ins` ·
   `GET|PATCH|DELETE /api/weigh-ins/:id`
+- `GET /api/workouts?from=&to=` · `POST /api/workouts` ·
+  `GET|PATCH|DELETE /api/workouts/:id`
 
-The Report is not a server feature: the frontend calls `GET /api/entries` and
-`GET /api/weigh-ins` for a date range and renders a print layout.
+The Report is not a server feature: the frontend calls `GET /api/entries`,
+`GET /api/weigh-ins` and `GET /api/workouts` for a date range and renders a
+print layout.
 
 ## Client logic worth testing (Vitest, test-first)
 
@@ -68,11 +77,14 @@ The Report is not a server feature: the frontend calls `GET /api/entries` and
 - `rankFrequentItems(entries, mealType)` — frequency x recency
 - `validateEntry(input)` — the description-or-photo rule
 - `validateWeighIn(input)` — weight range, time format, condition
+- `validateWorkout(input)` — time format, duration range, type, description
+  required, intensity 1–10
 - `interpretTranscript(text, confidence)` — dictation usable vs re-ask
-- `buildTimeline(entries, weighIns, options)` — merges meals and weigh-ins into
-  one time-sorted stream per day. The Report calls it with `{ from, to }`
-  (ascending, empty days included); the journal calls it with
-  `{ order: 'desc' }` (newest day and newest item first, no empty days)
+- `buildTimeline(entries, weighIns, workouts, options)` — merges meals,
+  weigh-ins and workouts into one time-sorted stream per day. The Report calls
+  it with `{ from, to }` (ascending, empty days included); the journal calls it
+  with `{ order: 'desc' }` (newest day and newest item first, no empty days).
+  When items share a minute: weigh-in, then workout, then meal.
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 ~0.72, via `<canvas>`, no library.
@@ -80,7 +92,11 @@ Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 Voice: `src/lib/voice.ts` wraps the browser `SpeechRecognition` API (fr-FR,
 feature-detected). `/dicter` auto-starts it, creates the entry from the
 transcript + time-of-day meal type, and lands on the entry's edit page.
-`EntryForm` also has an inline dictate button. No server component.
+`EntryForm` also has an inline dictate button. Workouts reuse the same
+`VoiceInput` component: the home 🥊 shortcut opens `/seances/add?voice=1`, which
+auto-starts dictation into the description field — the user then sets type,
+duration, intensity and feeling before saving (a workout has too many fields to
+auto-create). No server component.
 
 ## Auth
 

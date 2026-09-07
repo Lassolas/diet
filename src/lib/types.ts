@@ -51,3 +51,45 @@ export interface WeighInInput {
 	fasted: boolean;
 	clothed: boolean;
 }
+
+export const WORKOUT_TYPES = [
+	'running',
+	'bag',
+	'hiit',
+	'tabata',
+	'swimming',
+	'sparring',
+	'boxing_class',
+	'coaching'
+] as const;
+export type WorkoutType = (typeof WORKOUT_TYPES)[number];
+
+/** Duration is entered in 15-minute steps around a 45-minute default. */
+export const WORKOUT_DURATION_STEP_MIN = 15;
+export const WORKOUT_DURATION_DEFAULT_MIN = 45;
+export const WORKOUT_INTENSITY_DEFAULT = 5;
+
+export interface Workout {
+	id: string;
+	/** 'YYYY-MM-DDTHH:MM', Europe/Paris wall-clock (ADR 0002). Start of the session. */
+	startedAt: string;
+	/** Whole minutes. */
+	durationMin: number;
+	workoutType: WorkoutType;
+	description: string;
+	/** How it felt — pain, fatigue, form. Optional. */
+	feeling: string | null;
+	/** Perceived intensity, 1–10. */
+	intensity: number;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface WorkoutInput {
+	startedAt: string;
+	durationMin: number;
+	workoutType: WorkoutType;
+	description: string;
+	feeling?: string | null;
+	intensity: number;
+}

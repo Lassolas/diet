@@ -1,4 +1,4 @@
-import type { MealType, WeighIn } from '$lib/types';
+import type { MealType, WeighIn, WorkoutType } from '$lib/types';
 
 // User-facing copy is French (Eulidia convention: end-user's language).
 export const MEAL_TYPE_LABEL: Record<MealType, string> = {
@@ -14,4 +14,23 @@ export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string
 	if (w.fasted) parts.push('à jeun');
 	if (w.clothed) parts.push('habillé');
 	return parts.length ? parts.join(' · ') : '—';
+}
+
+export const WORKOUT_TYPE_LABEL: Record<WorkoutType, string> = {
+	running: 'Course à pied',
+	bag: 'Sac de frappe',
+	hiit: 'HIIT',
+	tabata: 'Tabata',
+	swimming: 'Piscine',
+	sparring: 'Sparring',
+	boxing_class: 'Cours de boxe collectif',
+	coaching: 'Séance individuelle (coach)'
+};
+
+/** '45 min', '1 h', '1 h 15' from a whole number of minutes. */
+export function formatDuration(min: number): string {
+	if (min < 60) return `${min} min`;
+	const h = Math.floor(min / 60);
+	const m = min % 60;
+	return m ? `${h} h ${String(m).padStart(2, '0')}` : `${h} h`;
 }

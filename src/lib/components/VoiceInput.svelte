@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { isDictationSupported, startDictation, type DictationHandle, type DictationErrorKind } from '$lib/voice';
 	import { interpretTranscript } from '$lib/domain/interpretTranscript';
 
-	let { onText, disabled = false }: {
+	let { onText, disabled = false, autostart = false }: {
 		onText: (text: string, lowConfidence: boolean) => void;
 		disabled?: boolean;
+		/** Begin listening as soon as the component mounts (used by the voice shortcuts). */
+		autostart?: boolean;
 	} = $props();
 
 	const supported = isDictationSupported();
@@ -77,6 +79,10 @@
 	function stop() {
 		handle?.stop();
 	}
+
+	onMount(() => {
+		if (autostart && supported && !disabled) start();
+	});
 
 	onDestroy(() => handle?.abort());
 </script>

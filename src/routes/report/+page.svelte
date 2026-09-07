@@ -2,9 +2,9 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
-	import { buildTimeline } from '$lib/domain/reportTimeline';
+	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL, conditionSummary } from '$lib/ui';
+	import { MEAL_TYPE_LABEL, conditionSummary, WORKOUT_TYPE_LABEL, formatDuration } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -15,8 +15,11 @@
 	let withPhotos = $state(true);
 
 	const days = $derived(
-		buildTimeline(data.entries, data.weighIns, { from: data.from, to: data.to })
+		buildTimeline(data.entries, data.weighIns, data.workouts, { from: data.from, to: data.to })
 	);
+
+	const itemId = (i: TimelineItem) =>
+		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'
@@ -46,7 +49,7 @@
 			{#if day.items.length === 0}
 				<p class="none">Rien enregistré</p>
 			{:else}
-				{#each day.items as item (item.kind + item.at + (item.kind === 'meal' ? item.entry.id : item.weighIn.id))}
+				{#each day.items as item (item.kind + item.at + itemId(item))}
 					{#if item.kind === 'weighIn'}
 						<div class="line weigh">
 							<span class="time">{formatTime(item.at)}</span>
@@ -54,6 +57,18 @@
 							<span class="body"
 								>{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}</span
 							>
+						</div>
+					{:else if item.kind === 'workout'}
+						<div class="line">
+							<div class="head">
+								<span class="time">{formatTime(item.at)}</span>
+								<span class="tag">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+								<span class="body">{item.workout.description}</span>
+							</div>
+							<p class="note">
+								{formatDuration(item.workout.durationMin)} · intensité {item.workout.intensity}/10{#if item.workout.feeling}
+									· {item.workout.feeling}{/if}
+							</p>
 						</div>
 					{:else}
 						<div class="line">

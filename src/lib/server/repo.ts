@@ -7,7 +7,10 @@ import {
 	type MealType,
 	type Photo,
 	type WeighIn,
-	type WeighInInput
+	type WeighInInput,
+	type Workout,
+	type WorkoutInput,
+	type WorkoutType
 } from '$lib/types';
 import type { FrequentItemSource } from '$lib/domain/frequentItems';
 
@@ -288,6 +291,115 @@ export async function updateWeighIn(
 
 export async function deleteWeighIn(db: D1Database, id: string): Promise<void> {
 	await db.prepare('DELETE FROM weigh_in WHERE id = ?').bind(id).run();
+}
+
+// --- Workouts --------------------------------------------------------------
+
+interface WorkoutRow {
+	id: string;
+	started_at: string;
+	duration_min: number;
+	workout_type: WorkoutType;
+	description: string;
+	feeling: string | null;
+	intensity: number;
+	created_at: string;
+	updated_at: string;
+}
+
+const toWorkout = (row: WorkoutRow): Workout => ({
+	id: row.id,
+	startedAt: row.started_at,
+	durationMin: row.duration_min,
+	workoutType: row.workout_type,
+	description: row.description,
+	feeling: row.feeling,
+	intensity: row.intensity,
+	createdAt: row.created_at,
+	updatedAt: row.updated_at
+});
+
+export async function listWorkouts(
+	db: D1Database,
+	range: { from?: string; to?: string } = {}
+): Promise<Workout[]> {
+	const clauses: string[] = [];
+	const binds: string[] = [];
+	if (range.from) {
+		clauses.push('started_at >= ?');
+		binds.push(range.from);
+	}
+	if (range.to) {
+		clauses.push('started_at <= ?');
+		binds.push(`${range.to}T23:59`);
+	}
+	const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+	const rows = await db
+		.prepare(`SELECT * FROM workout ${where} ORDER BY started_at DESC`)
+		.bind(...binds)
+		.all<WorkoutRow>();
+	return (rows.results ?? []).map(toWorkout);
+}
+
+export async function getWorkout(db: D1Database, id: string): Promise<Workout | null> {
+	const row = await db.prepare('SELECT * FROM workout WHERE id = ?').bind(id).first<WorkoutRow>();
+	return row ? toWorkout(row) : null;
+}
+
+export async function createWorkout(db: D1Database, input: WorkoutInput): Promise<Workout> {
+	const id = ulid();
+	const now = new Date().toISOString();
+	await db
+		.prepare(
+			`INSERT INTO workout
+			 (id, started_at, duration_min, workout_type, description, feeling, intensity, created_at, updated_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+		)
+		.bind(
+			id,
+			input.startedAt,
+			input.durationMin,
+			input.workoutType,
+			input.description.trim(),
+			input.feeling?.trim() || null,
+			input.intensity,
+			now,
+			now
+		)
+		.run();
+	return (await getWorkout(db, id))!;
+}
+
+export async function updateWorkout(
+	db: D1Database,
+	id: string,
+	patch: WorkoutInput
+): Promise<Workout | null> {
+	const existing = await db.prepare('SELECT id FROM workout WHERE id = ?').bind(id).first();
+	if (!existing) return null;
+	await db
+		.prepare(
+			`UPDATE workout
+			 SET started_at = ?, duration_min = ?, workout_type = ?, description = ?,
+			     feeling = ?, intensity = ?, updated_at = ?
+			 WHERE id = ?`
+		)
+		.bind(
+			patch.startedAt,
+			patch.durationMin,
+			patch.workoutType,
+			patch.description.trim(),
+			patch.feeling?.trim() || null,
+			patch.intensity,
+			new Date().toISOString(),
+			id
+		)
+		.run();
+	return getWorkout(db, id);
+}
+
+export async function deleteWorkout(db: D1Database, id: string): Promise<void> {
+	await db.prepare('DELETE FROM workout WHERE id = ?').bind(id).run();
 }
 
 // --- Frequent Items --------------------------------------------------------

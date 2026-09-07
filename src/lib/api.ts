@@ -1,4 +1,12 @@
-import type { MealEntry, MealEntryInput, Photo, WeighIn, WeighInInput } from '$lib/types';
+import type {
+	MealEntry,
+	MealEntryInput,
+	Photo,
+	WeighIn,
+	WeighInInput,
+	Workout,
+	WorkoutInput
+} from '$lib/types';
 
 async function unwrap<T>(res: Response): Promise<T> {
 	if (!res.ok) {
@@ -95,6 +103,41 @@ export const api = {
 
 	async deleteWeighIn(id: string): Promise<void> {
 		const res = await fetch(`/api/weigh-ins/${id}`, { method: 'DELETE' });
+		if (!res.ok) throw new Error(await res.text());
+	},
+
+	async listWorkouts(range?: { from?: string; to?: string }): Promise<Workout[]> {
+		const qs = new URLSearchParams();
+		if (range?.from) qs.set('from', range.from);
+		if (range?.to) qs.set('to', range.to);
+		const res = await fetch(`/api/workouts?${qs}`);
+		return (await unwrap<{ workouts: Workout[] }>(res)).workouts;
+	},
+
+	async getWorkout(id: string): Promise<Workout> {
+		return (await unwrap<{ workout: Workout }>(await fetch(`/api/workouts/${id}`))).workout;
+	},
+
+	async createWorkout(input: WorkoutInput): Promise<Workout> {
+		const res = await fetch('/api/workouts', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ workout: Workout }>(res)).workout;
+	},
+
+	async updateWorkout(id: string, input: WorkoutInput): Promise<Workout> {
+		const res = await fetch(`/api/workouts/${id}`, {
+			method: 'PATCH',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ workout: Workout }>(res)).workout;
+	},
+
+	async deleteWorkout(id: string): Promise<void> {
+		const res = await fetch(`/api/workouts/${id}`, { method: 'DELETE' });
 		if (!res.ok) throw new Error(await res.text());
 	}
 };

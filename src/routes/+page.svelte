@@ -1,18 +1,24 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { buildTimeline } from '$lib/domain/reportTimeline';
+	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL, conditionSummary } from '$lib/ui';
+	import { MEAL_TYPE_LABEL, conditionSummary, WORKOUT_TYPE_LABEL, formatDuration } from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
 	// Newest day first, and within a day, newest first.
-	const days = $derived(buildTimeline(data.entries, data.weighIns, { order: 'desc' }));
+	const days = $derived(
+		buildTimeline(data.entries, data.weighIns, data.workouts, { order: 'desc' })
+	);
+
+	const itemId = (i: TimelineItem) =>
+		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
 </script>
 
 <header>
 	<h1>Journal</h1>
 	<nav>
+		<a class="btn" href="/seances">Séances</a>
 		<a class="btn" href="/poids">Poids</a>
 		<a class="btn" href="/report">Rapport</a>
 	</nav>
@@ -27,7 +33,7 @@
 		<section>
 			<h2>{formatDay(day.date)}</h2>
 			<ul>
-				{#each day.items as item (item.kind + item.at + (item.kind === 'meal' ? item.entry.id : item.weighIn.id))}
+				{#each day.items as item (item.kind + item.at + itemId(item))}
 					{#if item.kind === 'weighIn'}
 						<li>
 							<a href="/poids/{item.weighIn.id}" class="weigh">
@@ -37,6 +43,20 @@
 								</div>
 								<p class="desc">
 									{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}
+								</p>
+							</a>
+						</li>
+					{:else if item.kind === 'workout'}
+						<li>
+							<a href="/seances/{item.workout.id}" class="workout">
+								<div class="row">
+									<span class="time">{formatTime(item.at)}</span>
+									<span class="type">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+								</div>
+								<p class="desc">{item.workout.description}</p>
+								<p class="note">
+									{formatDuration(item.workout.durationMin)} · intensité {item.workout.intensity}/10{#if item.workout.feeling}
+										· {item.workout.feeling}{/if}
 								</p>
 							</a>
 						</li>
@@ -67,6 +87,16 @@
 
 <div class="fabs">
 	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
+	<a
+		class="fab mini voice"
+		href="/seances/add?voice=1"
+		title="Séance à la voix"
+		aria-label="Séance à la voix"
+	>
+		<span class="ripple"></span>
+		<span class="ripple delay"></span>
+		🥊
+	</a>
 	<a class="fab mini voice" href="/dicter?type=collation" title="Collation à la voix" aria-label="Collation à la voix">
 		<span class="ripple"></span>
 		<span class="ripple delay"></span>
@@ -124,6 +154,9 @@
 	}
 	li a.weigh {
 		border-left: 3px solid var(--accent);
+	}
+	li a.workout {
+		border-left: 3px solid #c9803a;
 	}
 	.row {
 		display: flex;

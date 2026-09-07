@@ -47,6 +47,28 @@ like. Two independent yes/no flags, any combination: **fasted** (empty stomach)
 and **clothed** (wearing clothes).
 _Avoid_: state, mode, context
 
+**Workout**:
+A single recorded training session — when it started, how long it lasted, its
+Workout Type, a free-text description of what was done, an optional free-text
+Feeling, and a 1–10 Intensity. The context is boxing training. A separate time
+series from the Food Diary and from Weigh-ins; multiple per day are allowed.
+_Avoid_: exercise, training entry, activity, session log
+
+**Workout Type**:
+The kind of training session: one of a fixed list — running, boxing bag, HIIT,
+Tabata, swimming pool, sparring, boxing group session, or 1-1 with coach.
+_Avoid_: category, discipline, activity type
+
+**Intensity**:
+How hard a Workout felt, on a 1–10 scale the user sets by feel (perceived
+exertion). Not derived from heart rate or any measurement.
+_Avoid_: effort score, RPE, difficulty
+
+**Feeling**:
+An optional free-text remark on a Workout about how the body responded — pain,
+fatigue, good form. The Workout counterpart of a Meal Entry's Note.
+_Avoid_: note, comment, mood
+
 **Frequent Item**:
 A Description the user logs often (e.g. "protein shaker"), surfaced on the add
 screen as a one-tap chip that fills the Description field. Derived from past
@@ -61,12 +83,13 @@ _Avoid_: nutritionist, doctor, coach, reviewer
 
 **Report**:
 A print-optimised view over a chosen date range: one chronological stream per
-day with Weigh-ins and Meal Entries interleaved by time. The user prints it to
-PDF from the browser and hands that to the Dietician.
+day with Weigh-ins, Meal Entries and Workouts interleaved by time. The user
+prints it to PDF from the browser and hands that to the Dietician.
 _Avoid_: export, printout, summary
 
 **Dictation**:
-Speaking a Meal Entry's Description instead of typing it. The browser transcribes
-the speech; the text is accepted only if it is non-empty, not pure filler, and
-above a confidence threshold — otherwise the user is asked to say it again.
+Speaking a free-text field — a Meal Entry's Description, or a Workout's
+description — instead of typing it. The browser transcribes the speech; the text
+is accepted only if it is non-empty, not pure filler, and above a confidence
+threshold — otherwise the user is asked to say it again.
 _Avoid_: voice note, recording, transcription
