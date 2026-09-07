@@ -45,26 +45,29 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   day for both the journal (`+page.svelte`, newest-first, no empty days) and the
   Report (ascending, empty days shown) — one function, different options.
   Shared-minute order: weigh-in, workout, meal.
-- **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR). The
-  `/dicter` route auto-starts dictation and creates an entry from the transcript
-  + time-of-day meal type. No server-side transcription. The home 🍽️/🍌 FABs
-  point here; `?type=collation` forces the Snack meal type. `VoiceInput`
-  (inline dictate button, reused by `EntryForm` and `WorkoutForm`) takes an
-  `autostart` prop; the home 🥊 FAB opens `/seances/add?voice=1` which uses it.
+- **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR), no
+  server-side transcription. `VoiceInput` is the inline dictate button reused by
+  `EntryForm` and `WorkoutForm`; its `autostart` prop makes it listen on mount.
+  Every home voice FAB (🍽️ / 🍌 / 🥊) opens the matching add form with
+  `?voice=1` (`/add`, `/add?type=collation&voice=1`, `/sport/add?voice=1`) and
+  the transcript fills the description field — no auto-create. `?type=collation`
+  still forces the Snack meal type.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the
   `WeightWheel` component (CSS scroll-snap 0.1 kg picker); a new weigh-in
   defaults to the last recorded weight (loaded in `poids/add/+page.ts`).
   Conditions are two independent booleans (`fasted`, `clothed`).
-- **Workouts** (`/seances`, `workout` table) are a third time series parallel to
-  meal entries and weigh-ins — same shape of code (repo fns, `/api/workouts`
-  routes, list/add/edit pages, `WorkoutForm`). Not linked to `meal_entry`.
-  Boxing-training context. `workout_type` is a fixed 8-value enum
-  (`WORKOUT_TYPES` in `types.ts`, French labels in `ui.ts`); `duration_min` is
-  entered via a ±15-min stepper defaulting to 45; `intensity` is a 1–10 slider;
-  `feeling` is an optional free-text remark (the Note counterpart). Workouts
-  appear in both the journal and the Report.
+- **Workouts** (`/sport`, French UI label "Sport", `workout` table) are a third
+  time series parallel to meal entries and weigh-ins — same shape of code (repo
+  fns, `/api/workouts` routes, list/add/edit pages, `WorkoutForm`). Not linked
+  to `meal_entry`. Boxing-training context. `workout_type` is a fixed 8-value
+  enum (`WORKOUT_TYPES` in `types.ts`, French labels + emoji in `ui.ts`);
+  `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
+  is a 1–10 slider; `feeling` is an optional free-text remark (the Note
+  counterpart). Workouts appear in both the journal and the Report. The Report
+  prefixes every row's type tag with an emoji (`MEAL_TYPE_EMOJI` /
+  `WORKOUT_TYPE_EMOJI` in `ui.ts`, plus ⚖️ for weigh-ins).
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for
   `Date.toISOString()` for anything user-facing.

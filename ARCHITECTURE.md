@@ -90,13 +90,12 @@ Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 ~0.72, via `<canvas>`, no library.
 
 Voice: `src/lib/voice.ts` wraps the browser `SpeechRecognition` API (fr-FR,
-feature-detected). `/dicter` auto-starts it, creates the entry from the
-transcript + time-of-day meal type, and lands on the entry's edit page.
-`EntryForm` also has an inline dictate button. Workouts reuse the same
-`VoiceInput` component: the home 🥊 shortcut opens `/seances/add?voice=1`, which
-auto-starts dictation into the description field — the user then sets type,
-duration, intensity and feeling before saving (a workout has too many fields to
-auto-create). No server component.
+feature-detected). The `VoiceInput` component is an inline dictate button reused
+by `EntryForm` and `WorkoutForm`; its `autostart` prop makes it begin listening
+on mount. Every home voice shortcut opens the matching add form with `?voice=1`
+(`/add`, `/add?type=collation`, `/sport/add`) and drops the transcript straight
+into the description field — the user reviews and completes the other fields
+before saving. No server-side transcription, no auto-create.
 
 ## Auth
 

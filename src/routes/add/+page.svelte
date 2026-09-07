@@ -7,7 +7,7 @@
 
 <header><a class="btn" href="/">← Journal</a></header>
 <h1>Nouveau repas</h1>
-<EntryForm initialMealType={data.initialMealType} />
+<EntryForm initialMealType={data.initialMealType} autostartVoice={data.autostartVoice} />
 
 <style>
 	header {

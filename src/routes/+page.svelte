@@ -18,7 +18,7 @@
 <header>
 	<h1>Journal</h1>
 	<nav>
-		<a class="btn" href="/seances">Séances</a>
+		<a class="btn" href="/sport">Sport</a>
 		<a class="btn" href="/poids">Poids</a>
 		<a class="btn" href="/report">Rapport</a>
 	</nav>
@@ -48,7 +48,7 @@
 						</li>
 					{:else if item.kind === 'workout'}
 						<li>
-							<a href="/seances/{item.workout.id}" class="workout">
+							<a href="/sport/{item.workout.id}" class="workout">
 								<div class="row">
 									<span class="time">{formatTime(item.at)}</span>
 									<span class="type">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
@@ -89,20 +89,25 @@
 	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
 	<a
 		class="fab mini voice"
-		href="/seances/add?voice=1"
-		title="Séance à la voix"
-		aria-label="Séance à la voix"
+		href="/sport/add?voice=1"
+		title="Sport à la voix"
+		aria-label="Sport à la voix"
 	>
 		<span class="ripple"></span>
 		<span class="ripple delay"></span>
 		🥊
 	</a>
-	<a class="fab mini voice" href="/dicter?type=collation" title="Collation à la voix" aria-label="Collation à la voix">
+	<a
+		class="fab mini voice"
+		href="/add?type=collation&voice=1"
+		title="Collation à la voix"
+		aria-label="Collation à la voix"
+	>
 		<span class="ripple"></span>
 		<span class="ripple delay"></span>
 		🍌
 	</a>
-	<a class="fab mini voice" href="/dicter" title="Repas à la voix" aria-label="Repas à la voix">
+	<a class="fab mini voice" href="/add?voice=1" title="Repas à la voix" aria-label="Repas à la voix">
 		<span class="ripple"></span>
 		<span class="ripple delay"></span>
 		🍽️

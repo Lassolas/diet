@@ -8,6 +8,14 @@ export const MEAL_TYPE_LABEL: Record<MealType, string> = {
 	snack: 'Collation'
 };
 
+/** Leading glyph for a meal type — for at-a-glance scanning of the Report. */
+export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
+	breakfast: '🥐',
+	lunch: '🍽️',
+	dinner: '🍲',
+	snack: '🍎'
+};
+
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {
 	const parts: string[] = [];
@@ -25,6 +33,18 @@ export const WORKOUT_TYPE_LABEL: Record<WorkoutType, string> = {
 	sparring: 'Sparring',
 	boxing_class: 'Cours de boxe collectif',
 	coaching: 'Séance individuelle (coach)'
+};
+
+/** Leading glyph for a workout type — for at-a-glance scanning of the Report. */
+export const WORKOUT_TYPE_EMOJI: Record<WorkoutType, string> = {
+	running: '🏃',
+	bag: '🥊',
+	hiit: '🔥',
+	tabata: '⏱️',
+	swimming: '🏊',
+	sparring: '🤼',
+	boxing_class: '👥',
+	coaching: '🧑‍🏫'
 };
 
 /** '45 min', '1 h', '1 h 15' from a whole number of minutes. */

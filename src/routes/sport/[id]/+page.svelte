@@ -13,7 +13,7 @@
 		deleting = true;
 		try {
 			await api.deleteWorkout(data.workout.id);
-			await goto('/seances', { invalidateAll: true });
+			await goto('/sport', { invalidateAll: true });
 		} catch (e) {
 			errorMsg = (e as Error).message;
 			deleting = false;
@@ -21,7 +21,7 @@
 	}
 </script>
 
-<header><a class="btn" href="/seances">← Séances</a></header>
+<header><a class="btn" href="/sport">← Sport</a></header>
 <h1>Modifier la séance</h1>
 
 {#key data.workout.id}

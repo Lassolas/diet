@@ -5,7 +5,7 @@
 	let { data }: { data: PageData } = $props();
 </script>
 
-<header><a class="btn" href="/seances">← Séances</a></header>
+<header><a class="btn" href="/sport">← Sport</a></header>
 <h1>Nouvelle séance</h1>
 <WorkoutForm autostartVoice={data.autostartVoice} />
 

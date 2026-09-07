@@ -79,7 +79,7 @@
 		try {
 			if (editing && workout) await api.updateWorkout(workout.id, payload);
 			else await api.createWorkout(payload);
-			await goto('/seances', { invalidateAll: true });
+			await goto('/sport', { invalidateAll: true });
 		} catch (e) {
 			errorMsg = (e as Error).message;
 			saving = false;
@@ -148,7 +148,7 @@
 	{#if errorMsg}<p class="error">{errorMsg}</p>{/if}
 
 	<div class="actions">
-		<a class="btn" href="/seances">Annuler</a>
+		<a class="btn" href="/sport">Annuler</a>
 		<button type="submit" class="primary" disabled={saving}>
 			{saving ? 'Enregistrement…' : editing ? 'Enregistrer' : 'Ajouter'}
 		</button>

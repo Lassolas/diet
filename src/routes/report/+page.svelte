@@ -4,7 +4,14 @@
 	import type { PageData } from './$types';
 	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
 	import { formatTime, formatDay } from '$lib/time';
-	import { MEAL_TYPE_LABEL, conditionSummary, WORKOUT_TYPE_LABEL, formatDuration } from '$lib/ui';
+	import {
+		MEAL_TYPE_LABEL,
+		MEAL_TYPE_EMOJI,
+		conditionSummary,
+		WORKOUT_TYPE_LABEL,
+		WORKOUT_TYPE_EMOJI,
+		formatDuration
+	} from '$lib/ui';
 
 	let { data }: { data: PageData } = $props();
 
@@ -53,7 +60,7 @@
 					{#if item.kind === 'weighIn'}
 						<div class="line weigh">
 							<span class="time">{formatTime(item.at)}</span>
-							<span class="tag">Poids</span>
+							<span class="tag"><span class="emo">⚖️</span> Poids</span>
 							<span class="body"
 								>{item.weighIn.weightKg.toFixed(1)} kg · {conditionSummary(item.weighIn)}</span
 							>
@@ -62,7 +69,10 @@
 						<div class="line">
 							<div class="head">
 								<span class="time">{formatTime(item.at)}</span>
-								<span class="tag">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+								<span class="tag"
+									><span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
+									{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span
+								>
 								<span class="body">{item.workout.description}</span>
 							</div>
 							<p class="note">
@@ -74,7 +84,10 @@
 						<div class="line">
 							<div class="head">
 								<span class="time">{formatTime(item.at)}</span>
-								<span class="tag">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
+								<span class="tag"
+									><span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
+									{MEAL_TYPE_LABEL[item.entry.mealType]}</span
+								>
 								<span class="body">{item.entry.description ?? ''}</span>
 							</div>
 							{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
@@ -171,6 +184,9 @@
 		font-weight: 600;
 		font-size: 0.85rem;
 		min-width: 4.5rem;
+	}
+	.tag .emo {
+		font-weight: 400;
 	}
 	.line.weigh .body {
 		font-weight: 600;

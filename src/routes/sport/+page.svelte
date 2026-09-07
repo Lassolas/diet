@@ -8,7 +8,7 @@
 
 <header>
 	<a class="btn" href="/">← Journal</a>
-	<h1>Séances</h1>
+	<h1>Sport</h1>
 </header>
 
 {#if data.loadError}
@@ -19,7 +19,7 @@
 	<ul>
 		{#each data.workouts as w (w.id)}
 			<li>
-				<a href="/seances/{w.id}">
+				<a href="/sport/{w.id}">
 					<div class="top">
 						<span class="type">{WORKOUT_TYPE_LABEL[w.workoutType]}</span>
 						<span class="when">{formatDay(w.startedAt.slice(0, 10))} · {formatTime(w.startedAt)}</span>
@@ -33,7 +33,7 @@
 	</ul>
 {/if}
 
-<a class="fab" href="/seances/add" aria-label="Ajouter une séance">+</a>
+<a class="fab" href="/sport/add" aria-label="Ajouter une séance">+</a>
 
 <style>
 	header {

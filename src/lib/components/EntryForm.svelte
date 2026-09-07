@@ -12,8 +12,13 @@
 
 	let {
 		entry,
-		initialMealType
-	}: { entry?: MealEntry; initialMealType?: MealType | null } = $props();
+		initialMealType,
+		autostartVoice = false
+	}: {
+		entry?: MealEntry;
+		initialMealType?: MealType | null;
+		autostartVoice?: boolean;
+	} = $props();
 
 	// `entry` is fixed for this component's lifetime: the edit page remounts the
 	// form via {#key entry.id}. Seed the form fields from it once.
@@ -142,7 +147,7 @@
 	<label for="description">Qu'as-tu mangé&nbsp;?</label>
 	<textarea id="description" rows="3" bind:value={description} placeholder="2 œufs, pain complet, café noir"
 	></textarea>
-	<VoiceInput onText={onDictated} disabled={saving} />
+	<VoiceInput onText={onDictated} disabled={saving} autostart={autostartVoice} />
 
 	{#if chips.length}
 		<div class="chips">
