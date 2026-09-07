@@ -17,18 +17,13 @@ export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
 };
 
 /**
- * Background tint for an entry's coloured header, by category. Food is yellow
- * and warms through the day; a snack is a desaturated cream; sport is red-ish;
- * a weigh-in is blue-ish. All light enough for the default dark text.
+ * Muted tile colour behind an entry's emoji — one soft hue per category
+ * (warm wheat for food, soft clay for sport, cool slate for a weigh-in).
+ * Kept low-saturation so it accents rather than washes the row.
  */
-export const MEAL_TYPE_TINT: Record<MealType, string> = {
-	breakfast: '#fdf4cf',
-	lunch: '#fbe9ac',
-	dinner: '#f6dd93',
-	snack: '#eee7d2'
-};
-export const WORKOUT_TINT = '#f8d9d0';
-export const WEIGH_IN_TINT = '#dbe7f4';
+export const MEAL_TINT = '#F3E7C0';
+export const WORKOUT_TINT = '#F3D9D0';
+export const WEIGH_IN_TINT = '#D7E3EC';
 
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {

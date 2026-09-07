@@ -6,7 +6,7 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
-		MEAL_TYPE_TINT,
+		MEAL_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_TYPE_EMOJI,
@@ -61,23 +61,25 @@
 					<li>
 						{#if item.kind === 'weighIn'}
 							<a href="/poids/{item.weighIn.id}" class="item">
-								<div class="head" style="background:{WEIGH_IN_TINT}">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="emo">⚖️</span>
-									<span class="label">Poids</span>
-								</div>
-								<div class="content">
+								<span class="tile" style="background:{WEIGH_IN_TINT}">⚖️</span>
+								<div class="body">
+									<div class="head">
+										<span class="label">Poids</span>
+										<span class="time">{formatTime(item.at)}</span>
+									</div>
 									<p class="text">{kg(item.weighIn.weightKg)} · {conditionSummary(item.weighIn)}</p>
 								</div>
 							</a>
 						{:else if item.kind === 'workout'}
 							<a href="/sport/{item.workout.id}" class="item">
-								<div class="head" style="background:{WORKOUT_TINT}">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="emo">{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span>
-									<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
-								</div>
-								<div class="content">
+								<span class="tile" style="background:{WORKOUT_TINT}"
+									>{WORKOUT_TYPE_EMOJI[item.workout.workoutType]}</span
+								>
+								<div class="body">
+									<div class="head">
+										<span class="label">{WORKOUT_TYPE_LABEL[item.workout.workoutType]}</span>
+										<span class="time">{formatTime(item.at)}</span>
+									</div>
 									<p class="text">{item.workout.description}</p>
 									<p class="sub">
 										{formatDuration(item.workout.durationMin)} · intensité {item.workout
@@ -87,12 +89,14 @@
 							</a>
 						{:else}
 							<a href="/entry/{item.entry.id}" class="item">
-								<div class="head" style="background:{MEAL_TYPE_TINT[item.entry.mealType]}">
-									<span class="time">{formatTime(item.at)}</span>
-									<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
-									<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
-								</div>
-								<div class="content">
+								<span class="tile" style="background:{MEAL_TINT}"
+									>{MEAL_TYPE_EMOJI[item.entry.mealType]}</span
+								>
+								<div class="body">
+									<div class="head">
+										<span class="label">{MEAL_TYPE_LABEL[item.entry.mealType]}</span>
+										<span class="time">{formatTime(item.at)}</span>
+									</div>
 									{#if item.entry.description}<p class="text">{item.entry.description}</p>{/if}
 									{#if item.entry.note}<p class="sub">{item.entry.note}</p>{/if}
 									{#if item.entry.photos.length}
@@ -145,17 +149,33 @@
 
 <style>
 	header {
+		position: sticky;
+		top: 0;
+		z-index: 10;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding-top: 12px;
+		gap: 12px;
+		margin: 0 -16px;
+		padding: 10px 16px;
+		background: rgba(247, 246, 243, 0.82);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--border);
+	}
+	header h1 {
+		margin: 0;
+		font-size: 1.15rem;
 	}
 	header nav {
 		display: flex;
-		gap: 8px;
+		gap: 6px;
 	}
 	header .btn {
 		text-decoration: none;
+		padding: 6px 11px;
+		font-size: 0.85rem;
+		border-radius: 999px;
 	}
 	.empty {
 		color: var(--muted);
@@ -167,79 +187,102 @@
 	.tail {
 		height: 180px;
 	}
-	h2 {
-		font-size: 0.8rem;
-		font-weight: 600;
-		letter-spacing: 0.02em;
-		color: var(--muted);
-		text-transform: capitalize;
-		margin: 22px 0 6px;
+
+	section {
+		display: flex;
+		flex-direction: column;
 	}
+	h2 {
+		align-self: center;
+		width: fit-content;
+		margin: 22px 0 12px;
+		padding: 3px 12px;
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: lowercase;
+		color: var(--muted);
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+	}
+	h2::first-letter {
+		text-transform: uppercase;
+	}
+
 	ul {
 		list-style: none;
 		margin: 0;
 		padding: 0;
-		background: var(--surface);
-		border: 1px solid var(--border);
-		border-radius: 12px;
-		overflow: hidden;
-	}
-	li + li .item {
-		border-top: 1px solid var(--border);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
 	}
 
 	.item {
-		display: block;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 12px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		padding: 12px 14px;
 		text-decoration: none;
 		color: var(--text);
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.03),
+			0 2px 10px rgba(0, 0, 0, 0.03);
+	}
+	.tile {
+		width: 34px;
+		height: 34px;
+		border-radius: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.05rem;
+		line-height: 1;
+		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+		align-self: start;
+	}
+	.body {
+		min-width: 0;
 	}
 	.head {
 		display: flex;
 		align-items: baseline;
 		gap: 8px;
-		padding: 7px 14px;
-	}
-	.time {
-		flex-shrink: 0;
-		font-variant-numeric: tabular-nums;
-		font-size: 0.78rem;
-		color: var(--muted);
-	}
-	.emo {
-		flex-shrink: 0;
-		font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
-		font-size: 0.95rem;
-		line-height: 1;
 	}
 	.label {
 		font-weight: 600;
-		font-size: 0.9rem;
+		font-size: 0.92rem;
 	}
-	.content {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-		padding: 8px 14px 10px;
+	.time {
+		margin-left: auto;
+		flex-shrink: 0;
+		font-size: 0.75rem;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
 	}
 	.text {
-		margin: 0;
+		margin: 3px 0 0;
 		font-size: 0.95rem;
 	}
 	.sub {
-		margin: 0;
-		font-size: 0.85rem;
+		margin: 3px 0 0;
+		font-size: 0.83rem;
 		color: var(--muted);
 	}
 	.thumbs {
 		display: flex;
 		gap: 6px;
-		margin-top: 4px;
+		margin-top: 8px;
 	}
 	.thumbs img {
-		width: 52px;
-		height: 52px;
+		width: 54px;
+		height: 54px;
 		object-fit: cover;
-		border-radius: 6px;
+		border-radius: 8px;
 	}
 
 	.fabs {

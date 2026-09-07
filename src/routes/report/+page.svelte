@@ -7,7 +7,7 @@
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_TYPE_EMOJI,
-		MEAL_TYPE_TINT,
+		MEAL_TINT,
 		conditionSummary,
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_TYPE_EMOJI,
@@ -112,7 +112,7 @@
 						{:else}
 							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>
 							<div class="content">
-								<span class="label" style="background:{MEAL_TYPE_TINT[item.entry.mealType]}"
+								<span class="label" style="background:{MEAL_TINT}"
 									>{MEAL_TYPE_LABEL[item.entry.mealType]}</span
 								>{#if item.entry.description}<span class="text">{item.entry.description}</span>{/if}
 								{#if item.entry.note}<p class="note">{item.entry.note}</p>{/if}
