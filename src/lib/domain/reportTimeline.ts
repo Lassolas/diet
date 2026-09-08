@@ -1,14 +1,23 @@
-import type { MealEntry, WeighIn, Workout } from '$lib/types';
+import type { MealEntry, WeighIn, Workout, Sleep } from '$lib/types';
 
 export type TimelineItem =
 	| { kind: 'meal'; at: string; entry: MealEntry }
 	| { kind: 'weighIn'; at: string; weighIn: WeighIn }
-	| { kind: 'workout'; at: string; workout: Workout };
+	| { kind: 'workout'; at: string; workout: Workout }
+	| { kind: 'sleep'; at: string; sleep: Sleep };
 
 export interface TimelineDay {
 	/** 'YYYY-MM-DD'. */
 	date: string;
 	items: TimelineItem[];
+}
+
+/** The four series merged into a timeline. Any may be omitted / empty. */
+export interface TimelineSeries {
+	entries?: MealEntry[];
+	weighIns?: WeighIn[];
+	workouts?: Workout[];
+	sleeps?: Sleep[];
 }
 
 export interface TimelineOptions {
@@ -27,19 +36,19 @@ function nextDay(date: string): string {
 }
 
 /**
- * Merges Meal Entries, Weigh-ins and Workouts into one chronological stream per
- * calendar day. When `from`/`to` are given, every day in the range is emitted
- * (empty ones included) — used by the Report. Without them, only days that have
- * something are emitted — used by the journal. `order: 'desc'` flips days and the
- * items within each day to newest-first. When several items share a minute, a
- * weigh-in sorts first, then a workout, then a meal.
+ * Merges Meal Entries, Weigh-ins, Workouts and Sleep into one chronological
+ * stream per calendar day. A sleep is filed under its wake date. When `from`/`to`
+ * are given, every day in the range is emitted (empty ones included) — used by
+ * the Report. Without them, only days that have something are emitted — used by
+ * the journal. `order: 'desc'` flips days and the items within each day to
+ * newest-first. When several items share a minute they order sleep → weigh-in →
+ * workout → meal (the night precedes the day).
  */
 export function buildTimeline(
-	entries: MealEntry[],
-	weighIns: WeighIn[],
-	workouts: Workout[],
+	series: TimelineSeries,
 	options: TimelineOptions = {}
 ): TimelineDay[] {
+	const { entries = [], weighIns = [], workouts = [], sleeps = [] } = series;
 	const { from, to, order = 'asc' } = options;
 	if (from !== undefined || to !== undefined) {
 		if (!from || !to || !DATE_RE.test(from) || !DATE_RE.test(to)) {
@@ -55,6 +64,9 @@ export function buildTimeline(
 		list.push(item);
 	};
 
+	for (const sleep of sleeps) {
+		push(sleep.wakeAt.slice(0, 10), { kind: 'sleep', at: sleep.wakeAt, sleep });
+	}
 	for (const weighIn of weighIns) {
 		push(weighIn.measuredAt.slice(0, 10), { kind: 'weighIn', at: weighIn.measuredAt, weighIn });
 	}
@@ -65,10 +77,10 @@ export function buildTimeline(
 		push(entry.eatenAt.slice(0, 10), { kind: 'meal', at: entry.eatenAt, entry });
 	}
 
-	const rank = (i: TimelineItem) => (i.kind === 'weighIn' ? 0 : i.kind === 'workout' ? 1 : 2);
+	const RANK = { sleep: 0, weighIn: 1, workout: 2, meal: 3 } as const;
 	const sortItems = (items: TimelineItem[]) =>
 		items.sort((a, b) => {
-			const cmp = a.at.localeCompare(b.at) || rank(a) - rank(b);
+			const cmp = a.at.localeCompare(b.at) || RANK[a.kind] - RANK[b.kind];
 			return order === 'desc' ? -cmp : cmp;
 		});
 

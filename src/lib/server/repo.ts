@@ -10,7 +10,9 @@ import {
 	type WeighInInput,
 	type Workout,
 	type WorkoutInput,
-	type WorkoutType
+	type WorkoutType,
+	type Sleep,
+	type SleepInput
 } from '$lib/types';
 import type { FrequentItemSource } from '$lib/domain/frequentItems';
 
@@ -291,6 +293,96 @@ export async function updateWeighIn(
 
 export async function deleteWeighIn(db: D1Database, id: string): Promise<void> {
 	await db.prepare('DELETE FROM weigh_in WHERE id = ?').bind(id).run();
+}
+
+// --- Sleep ----------------------------------------------------------------
+
+interface SleepRow {
+	id: string;
+	bed_at: string;
+	wake_at: string;
+	quality: number;
+	note: string | null;
+	created_at: string;
+	updated_at: string;
+}
+
+const toSleep = (row: SleepRow): Sleep => ({
+	id: row.id,
+	bedAt: row.bed_at,
+	wakeAt: row.wake_at,
+	quality: row.quality,
+	note: row.note,
+	createdAt: row.created_at,
+	updatedAt: row.updated_at
+});
+
+export async function listSleeps(
+	db: D1Database,
+	range: { from?: string; to?: string } = {}
+): Promise<Sleep[]> {
+	const clauses: string[] = [];
+	const binds: string[] = [];
+	if (range.from) {
+		clauses.push('wake_at >= ?');
+		binds.push(range.from);
+	}
+	if (range.to) {
+		clauses.push('wake_at <= ?');
+		binds.push(`${range.to}T23:59`);
+	}
+	const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+	const rows = await db
+		.prepare(`SELECT * FROM sleep ${where} ORDER BY wake_at DESC`)
+		.bind(...binds)
+		.all<SleepRow>();
+	return (rows.results ?? []).map(toSleep);
+}
+
+export async function getSleep(db: D1Database, id: string): Promise<Sleep | null> {
+	const row = await db.prepare('SELECT * FROM sleep WHERE id = ?').bind(id).first<SleepRow>();
+	return row ? toSleep(row) : null;
+}
+
+export async function createSleep(db: D1Database, input: SleepInput): Promise<Sleep> {
+	const id = ulid();
+	const now = new Date().toISOString();
+	await db
+		.prepare(
+			`INSERT INTO sleep (id, bed_at, wake_at, quality, note, created_at, updated_at)
+			 VALUES (?, ?, ?, ?, ?, ?, ?)`
+		)
+		.bind(id, input.bedAt, input.wakeAt, input.quality, input.note?.trim() || null, now, now)
+		.run();
+	return (await getSleep(db, id))!;
+}
+
+export async function updateSleep(
+	db: D1Database,
+	id: string,
+	patch: SleepInput
+): Promise<Sleep | null> {
+	const existing = await db.prepare('SELECT id FROM sleep WHERE id = ?').bind(id).first();
+	if (!existing) return null;
+	await db
+		.prepare(
+			`UPDATE sleep SET bed_at = ?, wake_at = ?, quality = ?, note = ?, updated_at = ?
+			 WHERE id = ?`
+		)
+		.bind(
+			patch.bedAt,
+			patch.wakeAt,
+			patch.quality,
+			patch.note?.trim() || null,
+			new Date().toISOString(),
+			id
+		)
+		.run();
+	return getSleep(db, id);
+}
+
+export async function deleteSleep(db: D1Database, id: string): Promise<void> {
+	await db.prepare('DELETE FROM sleep WHERE id = ?').bind(id).run();
 }
 
 // --- Workouts --------------------------------------------------------------

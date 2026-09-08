@@ -69,6 +69,18 @@ An optional free-text remark on a Workout about how the body responded — pain,
 fatigue, good form. The Workout counterpart of a Meal Entry's Note.
 _Avoid_: note, comment, mood
 
+**Sleep** (UI: "Dodo"):
+A single recorded night's sleep — when the user went to bed, when they woke, a
+0–100 Quality, and an optional note. Assigned to the wake date. A fourth time
+series, parallel to the Food Diary, Weigh-ins and Workouts. Night sleep only —
+naps are not recorded.
+_Avoid_: nap, rest, sleep session, night entry
+
+**Quality** (of a Sleep):
+How well the night went, as a 0–100 % the user picks on an emoji wheel (💩 … 🌟).
+A gut feeling, not a device measurement. Distinct from a Workout's Intensity.
+_Avoid_: score, rating, sleep score
+
 **Frequent Item**:
 A Description the user logs often (e.g. "protein shaker"), surfaced on the add
 screen as a one-tap chip that fills the Description field. Derived from past
@@ -83,13 +95,14 @@ _Avoid_: nutritionist, doctor, coach, reviewer
 
 **Report**:
 A print-optimised view over a chosen date range: one chronological stream per
-day with Weigh-ins, Meal Entries and Workouts interleaved by time. The user
-prints it to PDF from the browser and hands that to the Dietician.
+day with Weigh-ins, Meal Entries, Workouts and Sleep interleaved by time
+(each theme can be toggled off). The user prints it to PDF from the browser and
+hands that to the Dietician.
 _Avoid_: export, printout, summary
 
 **Dictation**:
-Speaking a free-text field — a Meal Entry's Description, or a Workout's
-description — instead of typing it. The browser transcribes the speech; the text
-is accepted only if it is non-empty, not pure filler, and above a confidence
-threshold — otherwise the user is asked to say it again.
+Speaking a free-text field — a Meal Entry's Description, a Workout's description,
+a Sleep note — instead of typing it. The browser transcribes the speech; the
+text is accepted only if it is non-empty, not pure filler, and above a
+confidence threshold — otherwise the user is asked to say it again.
 _Avoid_: voice note, recording, transcription

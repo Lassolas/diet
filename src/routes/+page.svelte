@@ -10,6 +10,8 @@
 		WORKOUT_TYPE_LABEL,
 		WORKOUT_ACCENT,
 		WEIGH_IN_ACCENT,
+		SLEEP_ACCENT,
+		sleepQualityEmoji,
 		formatDuration
 	} from '$lib/ui';
 
@@ -18,11 +20,28 @@
 	// Chronological, like a chat log: oldest at the top, today at the bottom.
 	// Scroll up to go back in time.
 	const days = $derived(
-		buildTimeline(data.entries, data.weighIns, data.workouts, { order: 'asc' })
+		buildTimeline(
+			{
+				entries: data.entries,
+				weighIns: data.weighIns,
+				workouts: data.workouts,
+				sleeps: data.sleeps
+			},
+			{ order: 'asc' }
+		)
 	);
 
 	const itemId = (i: TimelineItem) =>
-		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
+		i.kind === 'meal'
+			? i.entry.id
+			: i.kind === 'weighIn'
+				? i.weighIn.id
+				: i.kind === 'workout'
+					? i.workout.id
+					: i.sleep.id;
+
+	const sleepDuration = (s: { bedAt: string; wakeAt: string }) =>
+		Math.round((Date.parse(s.wakeAt) - Date.parse(s.bedAt)) / 60000);
 
 	const kg = (n: number) => `${n.toFixed(1).replace('.', ',')} kg`;
 
@@ -41,6 +60,7 @@
 	<h1>Journal</h1>
 	<nav>
 		<a class="btn" href="/sport">Sport</a>
+		<a class="btn" href="/dodo">Dodo</a>
 		<a class="btn" href="/poids">Poids</a>
 		<a class="btn" href="/report">Rapport</a>
 	</nav>
@@ -84,6 +104,19 @@
 									{formatDuration(item.workout.durationMin)} · intensité {item.workout
 										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
 								</p>
+							</a>
+						{:else if item.kind === 'sleep'}
+							<a href="/dodo/{item.sleep.id}" class="item" style="border-left-color:{SLEEP_ACCENT}">
+								<div class="head">
+									<span class="label">Dodo</span>
+									<span class="time">{formatTime(item.at)}</span>
+								</div>
+								<p class="text">
+									{sleepQualityEmoji(item.sleep.quality)} · {formatTime(item.sleep.bedAt)} → {formatTime(
+										item.sleep.wakeAt
+									)} · {formatDuration(sleepDuration(item.sleep))}
+								</p>
+								{#if item.sleep.note}<p class="sub">{item.sleep.note}</p>{/if}
 							</a>
 						{:else}
 							<a href="/entry/{item.entry.id}" class="item" style="border-left-color:{MEAL_ACCENT}">
@@ -166,6 +199,8 @@
 	}
 	header nav {
 		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
 		gap: 6px;
 	}
 	header .btn {

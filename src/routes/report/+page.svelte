@@ -13,6 +13,8 @@
 		WORKOUT_TYPE_EMOJI,
 		WORKOUT_ACCENT,
 		WEIGH_IN_ACCENT,
+		SLEEP_ACCENT,
+		sleepQualityEmoji,
 		formatDuration
 	} from '$lib/ui';
 
@@ -29,26 +31,47 @@
 	let withMeals = $state(true);
 	let withWorkouts = $state(true);
 	let withWeighIns = $state(true);
+	let withSleep = $state(true);
 
 	const days = $derived(
 		buildTimeline(
-			withMeals ? data.entries : [],
-			withWeighIns ? data.weighIns : [],
-			withWorkouts ? data.workouts : [],
+			{
+				entries: withMeals ? data.entries : [],
+				weighIns: withWeighIns ? data.weighIns : [],
+				workouts: withWorkouts ? data.workouts : [],
+				sleeps: withSleep ? data.sleeps : []
+			},
 			{ from: data.from, to: data.to }
 		)
 	);
 
 	const includedThemes = $derived(
-		[withMeals && 'repas', withWorkouts && 'sport', withWeighIns && 'poids'].filter(
-			(t): t is string => Boolean(t)
-		)
+		[
+			withMeals && 'repas',
+			withWorkouts && 'sport',
+			withSleep && 'dodo',
+			withWeighIns && 'poids'
+		].filter((t): t is string => Boolean(t))
 	);
 
 	const itemId = (i: TimelineItem) =>
-		i.kind === 'meal' ? i.entry.id : i.kind === 'weighIn' ? i.weighIn.id : i.workout.id;
+		i.kind === 'meal'
+			? i.entry.id
+			: i.kind === 'weighIn'
+				? i.weighIn.id
+				: i.kind === 'workout'
+					? i.workout.id
+					: i.sleep.id;
 	const lineAccent = (i: TimelineItem) =>
-		i.kind === 'weighIn' ? WEIGH_IN_ACCENT : i.kind === 'workout' ? WORKOUT_ACCENT : MEAL_ACCENT;
+		i.kind === 'weighIn'
+			? WEIGH_IN_ACCENT
+			: i.kind === 'workout'
+				? WORKOUT_ACCENT
+				: i.kind === 'sleep'
+					? SLEEP_ACCENT
+					: MEAL_ACCENT;
+	const sleepDuration = (s: { bedAt: string; wakeAt: string }) =>
+		Math.round((Date.parse(s.wakeAt) - Date.parse(s.bedAt)) / 60000);
 	const generatedAt = new Intl.DateTimeFormat('fr-FR', {
 		dateStyle: 'long',
 		timeStyle: 'short'
@@ -68,6 +91,7 @@
 	<span class="group">
 		<label class="cb"><input type="checkbox" bind:checked={withMeals} /> Repas</label>
 		<label class="cb"><input type="checkbox" bind:checked={withWorkouts} /> Sport</label>
+		<label class="cb"><input type="checkbox" bind:checked={withSleep} /> Dodo</label>
 		<label class="cb"><input type="checkbox" bind:checked={withWeighIns} /> Poids</label>
 		<label class="cb">
 			<input type="checkbox" bind:checked={withPhotos} disabled={!withMeals} /> Photos
@@ -80,7 +104,7 @@
 <article class="report" class:hide-photos={!withPhotos}>
 	<h1>{withMeals ? 'Journal alimentaire' : 'Journal'}</h1>
 	<p class="meta">
-		Du {formatDay(data.from)} au {formatDay(data.to)} · généré le {generatedAt}{#if includedThemes.length < 3}
+		Du {formatDay(data.from)} au {formatDay(data.to)} · généré le {generatedAt}{#if includedThemes.length < 4}
 			· {includedThemes.join(', ') || 'aucun thème sélectionné'}{/if}
 	</p>
 
@@ -110,6 +134,16 @@
 									{formatDuration(item.workout.durationMin)} · intensité {item.workout
 										.intensity}/10{item.workout.feeling ? ` · ${item.workout.feeling}` : ''}
 								</p>
+							</div>
+						{:else if item.kind === 'sleep'}
+							<span class="emo">{sleepQualityEmoji(item.sleep.quality)}</span>
+							<div class="content">
+								<span class="label">Dodo</span><span class="text"
+									>{formatTime(item.sleep.bedAt)} → {formatTime(item.sleep.wakeAt)} · {formatDuration(
+										sleepDuration(item.sleep)
+									)}</span
+								>
+								{#if item.sleep.note}<p class="note">{item.sleep.note}</p>{/if}
 							</div>
 						{:else}
 							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>

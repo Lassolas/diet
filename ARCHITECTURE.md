@@ -45,6 +45,11 @@ Everything runs on the Cloudflare free tier (ADR 0001): Workers, D1. No R2
   `description` (not null), `feeling` (nullable), `intensity` (integer 1–10),
   `created_at`, `updated_at`. A third time series, parallel to `meal_entry` and
   `weigh_in`; multiple per day. Boxing-training context.
+- `sleep` ("Dodo"): `id` (ULID), `bed_at` / `wake_at` (text `YYYY-MM-DDTHH:MM`,
+  Paris wall-clock — a night crosses midnight), `quality` (integer 0–100),
+  `note` (nullable), `created_at`, `updated_at`. A fourth time series. Filed
+  under its **wake date** (indexed & range-queried on `wake_at`); night sleep
+  only, no nap concept; multiple per day allowed but not expected.
 
 Migrations are Wrangler D1 migration files in `migrations/`, applied manually.
 Backup relies on D1 Time Travel, plus a manual `wrangler d1 export` before risky
@@ -65,10 +70,12 @@ REST-ish, all under `/api` and gated by Cloudflare Access:
   `GET|PATCH|DELETE /api/weigh-ins/:id`
 - `GET /api/workouts?from=&to=` · `POST /api/workouts` ·
   `GET|PATCH|DELETE /api/workouts/:id`
+- `GET /api/sleeps?from=&to=` · `POST /api/sleeps` ·
+  `GET|PATCH|DELETE /api/sleeps/:id` (range filters on `wake_at`)
 
 The Report is not a server feature: the frontend calls `GET /api/entries`,
-`GET /api/weigh-ins` and `GET /api/workouts` for a date range and renders a
-print layout. Checkboxes (Repas / Sport / Poids / Photos) filter what is
+`/api/weigh-ins`, `/api/workouts` and `/api/sleeps` for a date range and renders
+a print layout. Checkboxes (Repas / Sport / Dodo / Poids / Photos) filter what is
 rendered client-side — no re-fetch; excluded series are passed to
 `buildTimeline` as empty arrays.
 
@@ -81,13 +88,16 @@ rendered client-side — no re-fetch; excluded series are passed to
 - `validateWeighIn(input)` — weight range, time format, condition
 - `validateWorkout(input)` — time format, duration range, type, description
   required, intensity 1–10
+- `validateSleep(input)` — time format, wake after bed, duration ≤ 18 h,
+  quality 0–100
 - `interpretTranscript(text, confidence)` — dictation usable vs re-ask
-- `buildTimeline(entries, weighIns, workouts, options)` — merges meals,
-  weigh-ins and workouts into one time-sorted stream per day. The Report calls
-  it with `{ from, to }` (empty days included); the journal calls it with
-  `{ order: 'asc' }` (no empty days). Both are ascending — oldest first, latest
-  at the bottom; the journal lands scrolled to the bottom, chat-log style.
-  When items share a minute: weigh-in, then workout, then meal.
+- `buildTimeline({ entries, weighIns, workouts, sleeps }, options)` — merges the
+  four series into one time-sorted stream per day (a sleep files under its wake
+  date). The Report calls it with `{ from, to }` (empty days included); the
+  journal calls it with `{ order: 'asc' }` (no empty days). Both are ascending —
+  oldest first, latest at the bottom; the journal lands scrolled to the bottom,
+  chat-log style. When items share a minute: sleep, then weigh-in, then workout,
+  then meal.
 
 Photos are resized client-side before upload: longest edge 1280px, JPEG quality
 ~0.72, via `<canvas>`, no library.

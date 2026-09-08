@@ -37,22 +37,23 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   column in a list query — `repo.ts` selects photo metadata only and fetches
   bytes one row at a time via `getPhotoBytes`.
 - **Domain logic is pure and tested**: `mealType`, `frequentItems`,
-  `validateEntry`, `validateWeighIn`, `validateWorkout`, `interpretTranscript`,
-  `reportTimeline` under `src/lib/domain/`. Both the client (`EntryForm` /
-  `WeighInForm` / `WorkoutForm`) and the server routes import the same
-  functions. Change behaviour here test-first.
-  `buildTimeline(entries, weighIns, workouts, opts)` merges all three series by
-  day for both the journal (`+page.svelte`, `order:'asc'`, no empty days — the
-  page lands scrolled to the bottom, chat-log style) and the Report (empty days
-  shown) — one function, different options. Both ascending (oldest first).
-  Shared-minute order: weigh-in, workout, meal.
+  `validateEntry`, `validateWeighIn`, `validateWorkout`, `validateSleep`,
+  `interpretTranscript`, `reportTimeline` under `src/lib/domain/`. Both the
+  client (`EntryForm` / `WeighInForm` / `WorkoutForm` / `SleepForm`) and the
+  server routes import the same functions. Change behaviour here test-first.
+  `buildTimeline({ entries, weighIns, workouts, sleeps }, opts)` (object arg —
+  each series optional) merges the four by day for both the journal
+  (`+page.svelte`, `order:'asc'`, no empty days — the page lands scrolled to the
+  bottom, chat-log style) and the Report (empty days shown). Both ascending
+  (oldest first). Shared-minute order: sleep, weigh-in, workout, meal.
 - **Voice**: `src/lib/voice.ts` wraps browser `SpeechRecognition` (fr-FR), no
   server-side transcription. `VoiceInput` is the inline dictate button reused by
   `EntryForm` and `WorkoutForm`; its `autostart` prop makes it listen on mount.
   Every home voice FAB (🍽️ / 🍌 / 🥊) opens the matching add form with
   `?voice=1` (`/add`, `/add?type=collation&voice=1`, `/sport/add?voice=1`) and
   the transcript fills the description field — no auto-create. `?type=collation`
-  still forces the Snack meal type.
+  still forces the Snack meal type. `SleepForm` also has a `VoiceInput` (note
+  field) but Dodo has no home FAB / voice shortcut.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the
@@ -69,18 +70,27 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   `duration_min` is entered via a ±15-min stepper defaulting to 45; `intensity`
   is a 1–10 slider; `feeling` is an optional free-text remark (the Note
   counterpart). Workouts appear in both the journal and the Report.
+- **Sleep** ("Dodo", `/dodo`, `sleep` table) is a fourth time series — repo fns,
+  `/api/sleeps` routes, list/add/edit pages, `SleepForm`. `bed_at` + `wake_at`
+  datetimes (a night crosses midnight); filed under the **wake date**
+  (range/order on `wake_at`). `quality` is 0–100, picked on `QualityWheel` (a
+  fixed 21-stop scroll wheel, emoji per band via `sleepQualityEmoji`, red→green
+  colour rail via `sleepQualityColor`, both in `ui.ts`); `note` optional +
+  voice. Night only, no naps. Add form defaults bed = yesterday 23:00, wake =
+  today 07:00.
 - **Row identity**: a saturated category accent as a 3px left strip —
-  `MEAL_ACCENT` (gold), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue) in
-  `ui.ts`, set via inline `border-left-color`. Journal cards carry no emoji
-  except a 🍌 prefix on the "Collation" label; the Report keeps a per-type emoji
-  column (`MEAL_TYPE_EMOJI` / `WORKOUT_TYPE_EMOJI` / ⚖️) and its `.line` strip
-  carries `print-color-adjust: exact`.
-- **Journal layout**: sticky frosted header keeps the Sport/Poids/Rapport nav
-  reachable from any scroll position; centred pill date separators; separated
+  `MEAL_ACCENT` (gold), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue),
+  `SLEEP_ACCENT` (indigo) in `ui.ts`, set via inline `border-left-color`.
+  Journal cards carry no emoji except a 🍌 prefix on "Collation" and the quality
+  emoji in a Dodo card's text line; the Report keeps a per-type emoji column
+  (`MEAL_TYPE_EMOJI` / `WORKOUT_TYPE_EMOJI` / ⚖️ / the sleep quality emoji) and
+  its `.line` strip carries `print-color-adjust: exact`.
+- **Journal layout**: sticky frosted header keeps the Sport/Dodo/Poids/Rapport
+  nav reachable from any scroll position; centred pill date separators; separated
   cards (`gap`, hairline border, left accent strip, soft shadow); a `.tail`
   spacer clears the FABs.
-- **Report filters**: the Repas/Sport/Poids/Photos checkboxes filter the print
-  client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
+- **Report filters**: the Repas/Sport/Dodo/Poids/Photos checkboxes filter the
+  print client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
   "alimentaire" when Repas is off; days with nothing logged get a dimmed heading.
 - **Times are Paris wall-clock strings** (`YYYY-MM-DDTHH:MM`), never UTC — see
   ADR 0002. `src/lib/time.ts` has the formatting/`now` helpers; don't reach for

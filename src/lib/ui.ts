@@ -24,6 +24,7 @@ export const MEAL_TYPE_EMOJI: Record<MealType, string> = {
 export const MEAL_ACCENT = '#D49A2C';
 export const WORKOUT_ACCENT = '#C6423B';
 export const WEIGH_IN_ACCENT = '#3C6FB0';
+export const SLEEP_ACCENT = '#6D5AAB';
 
 /** The active conditions of a weigh-in, e.g. "à jeun · habillé" or "—". */
 export function conditionSummary(w: Pick<WeighIn, 'fasted' | 'clothed'>): string {
@@ -83,4 +84,33 @@ export function formatDuration(min: number): string {
 	const h = Math.floor(min / 60);
 	const m = min % 60;
 	return m ? `${h} h ${String(m).padStart(2, '0')}` : `${h} h`;
+}
+
+/**
+ * Sleep quality ladder — worst night to perfect, banded across 0–100.
+ * 100 alone lands on 🌟; 45–55 (the default) lands on 😐.
+ */
+export const SLEEP_QUALITY_EMOJI = [
+	'💩',
+	'🥴',
+	'😩',
+	'😕',
+	'😐',
+	'🙂',
+	'😌',
+	'💪',
+	'🔋',
+	'🌟'
+] as const;
+
+/** The emoji for a 0–100 quality value. */
+export function sleepQualityEmoji(pct: number): string {
+	const i = Math.max(0, Math.min(9, Math.floor((pct * 9) / 100)));
+	return SLEEP_QUALITY_EMOJI[i];
+}
+
+/** A colour on a red→amber→green ramp for a 0–100 quality value (wheel only). */
+export function sleepQualityColor(pct: number): string {
+	const hue = 4 + (Math.max(0, Math.min(100, pct)) / 100) * 130;
+	return `hsl(${Math.round(hue)} 55% 47%)`;
 }

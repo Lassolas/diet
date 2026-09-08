@@ -5,7 +5,9 @@ import type {
 	WeighIn,
 	WeighInInput,
 	Workout,
-	WorkoutInput
+	WorkoutInput,
+	Sleep,
+	SleepInput
 } from '$lib/types';
 
 async function unwrap<T>(res: Response): Promise<T> {
@@ -138,6 +140,41 @@ export const api = {
 
 	async deleteWorkout(id: string): Promise<void> {
 		const res = await fetch(`/api/workouts/${id}`, { method: 'DELETE' });
+		if (!res.ok) throw new Error(await res.text());
+	},
+
+	async listSleeps(range?: { from?: string; to?: string }): Promise<Sleep[]> {
+		const qs = new URLSearchParams();
+		if (range?.from) qs.set('from', range.from);
+		if (range?.to) qs.set('to', range.to);
+		const res = await fetch(`/api/sleeps?${qs}`);
+		return (await unwrap<{ sleeps: Sleep[] }>(res)).sleeps;
+	},
+
+	async getSleep(id: string): Promise<Sleep> {
+		return (await unwrap<{ sleep: Sleep }>(await fetch(`/api/sleeps/${id}`))).sleep;
+	},
+
+	async createSleep(input: SleepInput): Promise<Sleep> {
+		const res = await fetch('/api/sleeps', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ sleep: Sleep }>(res)).sleep;
+	},
+
+	async updateSleep(id: string, input: SleepInput): Promise<Sleep> {
+		const res = await fetch(`/api/sleeps/${id}`, {
+			method: 'PATCH',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(input)
+		});
+		return (await unwrap<{ sleep: Sleep }>(res)).sleep;
+	},
+
+	async deleteSleep(id: string): Promise<void> {
+		const res = await fetch(`/api/sleeps/${id}`, { method: 'DELETE' });
 		if (!res.ok) throw new Error(await res.text());
 	}
 };

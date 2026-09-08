@@ -102,3 +102,27 @@ export interface WorkoutInput {
 	feeling?: string | null;
 	intensity: number;
 }
+
+/** Sleep ("Dodo") quality is a 0–100 %, picked on a step-5 wheel. */
+export const SLEEP_QUALITY_STEP = 5;
+export const SLEEP_QUALITY_DEFAULT = 50;
+
+export interface Sleep {
+	id: string;
+	/** 'YYYY-MM-DDTHH:MM', Europe/Paris wall-clock (ADR 0002). When they went to bed. */
+	bedAt: string;
+	/** 'YYYY-MM-DDTHH:MM', Europe/Paris wall-clock. When they woke — the day-assignment key. */
+	wakeAt: string;
+	/** Perceived quality, 0–100. */
+	quality: number;
+	note: string | null;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface SleepInput {
+	bedAt: string;
+	wakeAt: string;
+	quality: number;
+	note?: string | null;
+}
