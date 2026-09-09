@@ -54,6 +54,14 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   the transcript fills the description field — no auto-create. `?type=collation`
   still forces the Snack meal type. `SleepForm` also has a `VoiceInput` (note
   field); Dodo has a plain 😴 mini-FAB → `/dodo/add` but no voice shortcut.
+- **Coffee** is not its own table — it's a Snack `meal_entry` whose description
+  is exactly `"N café(s)"` (`src/lib/domain/coffee.ts`: `isCoffee` / `coffeeDose`
+  / `coffeeDescription` / `coffeeEntryInput`, tested). The home ☕ mini-FAB is a
+  `<button>` (not a link) that POSTs one at `now` and `invalidateAll()`s — no
+  form. Coffee rows link to `/cafe/[id]` (a minimal time + dose ×1–3 + delete
+  screen) instead of `/entry/[id]`; journal & Report render them as "☕ Café"
+  (+ "×N"), hiding the "N café" description. No migration — `snack` + the regex
+  is the whole mechanism.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the

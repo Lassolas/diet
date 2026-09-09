@@ -69,6 +69,13 @@ An optional free-text remark on a Workout about how the body responded — pain,
 fatigue, good form. The Workout counterpart of a Meal Entry's Note.
 _Avoid_: note, comment, mood
 
+**Coffee**:
+A one-tap shortcut for logging a coffee. Recorded as a Meal Entry — Meal Type
+Snack, Description exactly "N café(s)" (N is the dose, 1–3) — so it lives in the
+Food Diary like anything else. A dedicated small screen edits just its time and
+dose, or deletes it.
+_Avoid_: caffeine, drink entry, espresso
+
 **Sleep** (UI: "Dodo"):
 A single recorded night's sleep — when the user went to bed, when they woke, a
 0–100 Quality, and an optional note. Assigned to the wake date. A fourth time

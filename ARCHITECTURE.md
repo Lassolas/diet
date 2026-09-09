@@ -90,6 +90,9 @@ rendered client-side — no re-fetch; excluded series are passed to
   required, intensity 1–10
 - `validateSleep(input)` — time format, wake after bed, duration ≤ 18 h,
   quality 0–100
+- `coffee.ts` — `isCoffee` / `coffeeDose` / `coffeeDescription`: a coffee is a
+  Snack whose description is exactly "N café(s)"; the ☕ home button and
+  `/cafe/[id]` both go through it
 - `interpretTranscript(text, confidence)` — dictation usable vs re-ask
 - `buildTimeline({ entries, weighIns, workouts, sleeps }, options)` — merges the
   four series into one time-sorted stream per day (a sleep files under its wake

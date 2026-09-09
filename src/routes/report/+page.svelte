@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
+	import { isCoffee, coffeeDose } from '$lib/domain/coffee';
 	import { formatTime, formatDay } from '$lib/time';
 	import {
 		MEAL_TYPE_LABEL,
@@ -144,6 +145,15 @@
 									)}</span
 								>
 								{#if item.sleep.note}<p class="note">{item.sleep.note}</p>{/if}
+							</div>
+						{:else if item.kind === 'meal' && isCoffee(item.entry)}
+							<span class="emo">☕</span>
+							<div class="content">
+								<span class="label"
+									>Café{coffeeDose(item.entry.description) > 1
+										? ` ×${coffeeDose(item.entry.description)}`
+										: ''}</span
+								>
 							</div>
 						{:else}
 							<span class="emo">{MEAL_TYPE_EMOJI[item.entry.mealType]}</span>

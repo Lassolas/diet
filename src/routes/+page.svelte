@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { invalidateAll } from '$app/navigation';
 	import type { PageData } from './$types';
 	import { buildTimeline, type TimelineItem } from '$lib/domain/reportTimeline';
-	import { formatTime, formatDay } from '$lib/time';
+	import { isCoffee, coffeeDose, coffeeEntryInput } from '$lib/domain/coffee';
+	import { api } from '$lib/api';
+	import { formatTime, formatDay, nowLocalInput } from '$lib/time';
 	import {
 		MEAL_TYPE_LABEL,
 		MEAL_ACCENT,
@@ -54,6 +57,27 @@
 		requestAnimationFrame(toBottom);
 		setTimeout(toBottom, 150);
 	});
+
+	// One-tap coffee: log a snack "1 café" at the current time, no form.
+	let coffeeBusy = $state(false);
+	let coffeeMsg = $state('');
+	async function addCoffee() {
+		if (coffeeBusy) return;
+		coffeeBusy = true;
+		coffeeMsg = '';
+		try {
+			await api.createEntry(coffeeEntryInput(nowLocalInput()));
+			await invalidateAll();
+			requestAnimationFrame(() =>
+				window.scrollTo(0, document.documentElement.scrollHeight)
+			);
+		} catch {
+			coffeeMsg = 'Échec — réessaie';
+			setTimeout(() => (coffeeMsg = ''), 3000);
+		} finally {
+			coffeeBusy = false;
+		}
+	}
 </script>
 
 <header>
@@ -118,6 +142,17 @@
 								</p>
 								{#if item.sleep.note}<p class="sub">{item.sleep.note}</p>{/if}
 							</a>
+						{:else if item.kind === 'meal' && isCoffee(item.entry)}
+							<a href="/cafe/{item.entry.id}" class="item" style="border-left-color:{MEAL_ACCENT}">
+								<div class="head">
+									<span class="label"
+										>☕ Café{coffeeDose(item.entry.description) > 1
+											? ` ×${coffeeDose(item.entry.description)}`
+											: ''}</span
+									>
+									<span class="time">{formatTime(item.at)}</span>
+								</div>
+							</a>
 						{:else}
 							<a href="/entry/{item.entry.id}" class="item" style="border-left-color:{MEAL_ACCENT}">
 								<div class="head">
@@ -147,7 +182,18 @@
 	<div class="tail" aria-hidden="true"></div>
 {/if}
 
+{#if coffeeMsg}<p class="coffee-msg" role="status">{coffeeMsg}</p>{/if}
+
 <div class="fabs">
+	<button
+		class="fab mini"
+		onclick={addCoffee}
+		disabled={coffeeBusy}
+		title="Un café"
+		aria-label="Ajouter un café"
+	>
+		☕
+	</button>
 	<a class="fab mini" href="/dodo/add" title="Nouveau dodo" aria-label="Nouveau dodo">😴</a>
 	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
 	<a
@@ -329,9 +375,27 @@
 	.fab.mini {
 		width: 46px;
 		height: 46px;
+		padding: 0;
 		background: var(--surface);
 		border: 1px solid var(--border);
 		font-size: 1.3rem;
+		cursor: pointer;
+	}
+	.fab.mini:disabled {
+		opacity: 0.5;
+	}
+	.coffee-msg {
+		position: fixed;
+		left: 50%;
+		bottom: 24px;
+		transform: translateX(-50%);
+		margin: 0;
+		padding: 8px 14px;
+		border-radius: 999px;
+		background: var(--danger);
+		color: #fff;
+		font-size: 0.85rem;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 	}
 	.fab.voice {
 		position: relative;
