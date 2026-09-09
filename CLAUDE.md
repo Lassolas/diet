@@ -53,7 +53,7 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   `?voice=1` (`/add`, `/add?type=collation&voice=1`, `/sport/add?voice=1`) and
   the transcript fills the description field — no auto-create. `?type=collation`
   still forces the Snack meal type. `SleepForm` also has a `VoiceInput` (note
-  field) but Dodo has no home FAB / voice shortcut.
+  field); Dodo has a plain 😴 mini-FAB → `/dodo/add` but no voice shortcut.
 - **Weigh-ins** (`/poids`, `weigh_in` table) are a second time series parallel
   to meal entries — same shape of code (repo fns, `/api/weigh-ins` routes,
   list/add/edit pages). Not linked to `meal_entry`. Weight input is the
@@ -77,7 +77,7 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   fixed 21-stop scroll wheel, emoji per band via `sleepQualityEmoji`, red→green
   colour rail via `sleepQualityColor`, both in `ui.ts`); `note` optional +
   voice. Night only, no naps. Add form defaults bed = yesterday 23:00, wake =
-  today 07:00.
+  today 07:00; reached from a 😴 mini-FAB on the home page.
 - **Row identity**: a saturated category accent as a 3px left strip —
   `MEAL_ACCENT` (gold), `WORKOUT_ACCENT` (red), `WEIGH_IN_ACCENT` (blue),
   `SLEEP_ACCENT` (indigo) in `ui.ts`, set via inline `border-left-color`.

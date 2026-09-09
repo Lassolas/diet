@@ -148,6 +148,7 @@
 {/if}
 
 <div class="fabs">
+	<a class="fab mini" href="/dodo/add" title="Nouveau dodo" aria-label="Nouveau dodo">😴</a>
 	<a class="fab mini" href="/poids/add" title="Nouvelle pesée" aria-label="Nouvelle pesée">⚖️</a>
 	<a
 		class="fab mini voice"
@@ -217,7 +218,7 @@
 	/* Clearance so the newest rows sit above the floating action buttons when
 	   the page lands scrolled to the bottom. */
 	.tail {
-		height: 180px;
+		height: 210px;
 	}
 
 	section {
