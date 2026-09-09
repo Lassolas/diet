@@ -261,10 +261,9 @@
 		margin-top: 40px;
 		text-align: center;
 	}
-	/* Clearance so the newest rows sit above the floating action buttons when
-	   the page lands scrolled to the bottom. */
+	/* A little breathing room above the bottom toolbar (`.app` already pads 96px). */
 	.tail {
-		height: 210px;
+		height: 24px;
 	}
 
 	section {
@@ -348,37 +347,51 @@
 		border-radius: 8px;
 	}
 
+	/* A frosted bottom toolbar — leaves the right edge (and card times) clear. */
 	.fabs {
 		position: fixed;
-		right: max(16px, calc(50vw - 320px + 16px));
-		bottom: 24px;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 20;
 		display: flex;
-		flex-direction: column;
 		align-items: center;
-		gap: 10px;
+		justify-content: space-evenly;
+		gap: 4px;
+		padding: 8px max(10px, calc(50vw - 320px + 10px));
+		padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+		background: rgba(247, 246, 243, 0.9);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-top: 1px solid var(--border);
+		overflow-x: auto; /* safety on very narrow screens; scrollbar hidden */
+		scrollbar-width: none;
+	}
+	.fabs::-webkit-scrollbar {
+		display: none;
 	}
 	.fab {
+		flex-shrink: 0;
 		border-radius: 999px;
 		text-decoration: none;
-		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 	.fab.add {
-		width: 60px;
-		height: 60px;
-		background: var(--accent);
-		color: var(--accent-text);
-		font-size: 2rem;
-	}
-	.fab.mini {
 		width: 46px;
 		height: 46px;
+		background: var(--accent);
+		color: var(--accent-text);
+		font-size: 1.7rem;
+	}
+	.fab.mini {
+		width: 44px;
+		height: 44px;
 		padding: 0;
-		background: var(--surface);
-		border: 1px solid var(--border);
-		font-size: 1.3rem;
+		background: transparent;
+		border: none;
+		font-size: 1.35rem;
 		cursor: pointer;
 	}
 	.fab.mini:disabled {
@@ -387,8 +400,9 @@
 	.coffee-msg {
 		position: fixed;
 		left: 50%;
-		bottom: 24px;
+		bottom: 72px;
 		transform: translateX(-50%);
+		z-index: 21;
 		margin: 0;
 		padding: 8px 14px;
 		border-radius: 999px;
@@ -419,10 +433,10 @@
 	@keyframes ripple {
 		0% {
 			transform: scale(1);
-			opacity: 0.55;
+			opacity: 0.5;
 		}
 		100% {
-			transform: scale(1.6);
+			transform: scale(1.4);
 			opacity: 0;
 		}
 	}

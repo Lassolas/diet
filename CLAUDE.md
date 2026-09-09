@@ -95,8 +95,10 @@ a **Workers** project (`main` + `[assets]` in `wrangler.toml`), not Pages — us
   its `.line` strip carries `print-color-adjust: exact`.
 - **Journal layout**: sticky frosted header keeps the Sport/Dodo/Poids/Rapport
   nav reachable from any scroll position; centred pill date separators; separated
-  cards (`gap`, hairline border, left accent strip, soft shadow); a `.tail`
-  spacer clears the FABs.
+  cards (`gap`, hairline border, left accent strip, soft shadow). The quick-add
+  buttons (`.fabs`: ☕ 😴 ⚖️ 🥊 🍌 🍽️ +) are a frosted **bottom toolbar** (row,
+  not a right-edge stack — that covered the card times); a small `.tail` spacer +
+  `.app`'s 96px bottom padding clear it. Other list pages keep a single `+` FAB.
 - **Report filters**: the Repas/Sport/Dodo/Poids/Photos checkboxes filter the
   print client-side (excluded series → empty arrays into `buildTimeline`); the h1 drops
   "alimentaire" when Repas is off; days with nothing logged get a dimmed heading.
